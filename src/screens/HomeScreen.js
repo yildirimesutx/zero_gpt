@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../theme/ThemeProvider';
 
 
 
@@ -10,15 +11,18 @@ const HomeScreen = ({ navigation }) => {
 
 
     const { t } = useTranslation();
+    const theme = useTheme();
 
 
 
 
 
   return (
-    <View style={styles.container}>
-       <Text>{t('home.welcome')}</Text>
-       <Text>{t('home.info')}</Text>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <Text style={{ color: theme.colors.text }}>
+      Anlık tema: {theme.colors.background === '#000000' ? 'Dark' : 'Light'}
+    </Text>
+
       <TouchableOpacity
         style={styles.iconButton}
         onPress={() => navigation.navigate('GptPage')}
@@ -30,11 +34,12 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+   
   iconButton: {
     position: 'absolute',
     bottom: 20,
