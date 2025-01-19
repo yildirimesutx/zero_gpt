@@ -7,21 +7,21 @@ import News from './News';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { useTheme } from '../theme/ThemeProvider';
+// i18n import
+import i18n from '../i18n/i18n';
 
 const Tab = createBottomTabNavigator();
 
 const GptPage = () => {
-  // 1) Tema verisini çekiyoruz
   const theme = useTheme();
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        // Aktif/Pasif ikon renkleri
         tabBarActiveTintColor: theme.colors.tabBarActive,
         tabBarInactiveTintColor: theme.colors.tabBarInactive,
         tabBarStyle: {
-          backgroundColor: theme.colors.tabBackground, // Temaya göre değişir
+          backgroundColor: theme.colors.tabBackground,
           height: 100,
           borderTopWidth: 0,
         },
@@ -39,18 +39,43 @@ const GptPage = () => {
         tabBarLabelStyle: {
           fontSize: 12,
         },
+        headerStyle: {
+          backgroundColor: theme.colors.headerBg,
+        },
+        headerTintColor: theme.colors.headerText,
+        headerTitleAlign: 'center',
       })}
     >
-      <Tab.Screen name="PastTopics" component={PastTopics} />
+      <Tab.Screen
+        name="PastTopics"
+        component={PastTopics}
+        options={{
+          // i18n'den gelen çeviri
+          tabBarLabel: i18n.t('pastTopics'), 
+          headerTitleAlign: 'center',
+        }}
+      />
+
       <Tab.Screen
         name="ZeroGPT"
         component={ChatPage}
         options={{
+          // Burada sabit "ZeroGpt"
           tabBarLabel: 'ZeroGpt',
           headerShadowVisible: false,
+          headerTitleAlign: 'center',
         }}
       />
-      <Tab.Screen name="News" component={News} />
+
+      <Tab.Screen
+        name="News"
+        component={News}
+        options={{
+          // i18n'den gelen çeviri
+          tabBarLabel: i18n.t('news'), 
+          headerTitleAlign: 'center',
+        }}
+      />
     </Tab.Navigator>
   );
 };

@@ -20,6 +20,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
     <Text style={{ color: theme.colors.text }}>
+        Ana Sayfa -Web den gelen component
       Anlık tema: {theme.colors.background === '#000000' ? 'Dark' : 'Light'}
     </Text>
 

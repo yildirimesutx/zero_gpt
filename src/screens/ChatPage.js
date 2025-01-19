@@ -1,3 +1,4 @@
+// src/screens/ChatPage.js
 import React, { useState } from 'react';
 import {
   View,
@@ -28,7 +29,10 @@ const ChatPage = () => {
 
   const renderMessageItem = ({ item }) => {
     return (
-      <View style={styles.messageBubble}>
+      <View style={[
+        styles.messageBubble,
+        { backgroundColor: theme.colors.bubbleBg } // <-- Tema renk kullanımı
+      ]}>
         <Text style={[styles.messageText, { color: theme.colors.text }]}>
           {item.text}
         </Text>
@@ -97,7 +101,7 @@ const styles = StyleSheet.create({
   },
   messageBubble: {
     alignSelf: 'flex-end',
-    backgroundColor: '#E6E6E6',
+    // backgroundColor: '#E6E6E6', <-- Kaldırdık, temadan alıyoruz
     padding: 10,
     borderRadius: 8,
     marginVertical: 5,
@@ -121,10 +125,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     height: 40,
-    // Sadece dikey ortalama (vertical center):
-    textAlign: 'left',         // Yatayda soldan başla
-    textAlignVertical: 'center', 
-    // iOS 13+ ve Android'de multiline'da dikey ortalama
+    textAlign: 'left',
+    textAlignVertical: 'center',
   },
   iconWrapper: {
     marginLeft: 8,

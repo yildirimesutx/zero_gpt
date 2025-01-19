@@ -1,7 +1,9 @@
 {
     "hello": "Merhaba",
     "welcome": "Uygulamamıza hoş geldiniz!",
-    "placeholder_message": "Mesajınızı buraya yazın..."
+    "placeholder_message": "Mesajınızı buraya yazın...",
+    "pastTopics": "Geçmiş",
+    "news": "Haberler"
   }
   
   
