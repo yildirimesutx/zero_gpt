@@ -1,0 +1,16 @@
+{
+    "home": {
+      "welcome": "Uygulamaya hoş geldiniz!",
+      "info": "Burada size özel bilgiler bulunur."
+    },
+    "settings": {
+      "title": "Ayarlar",
+      "language": "Dil Seçimi",
+      "theme": "Tema Ayarları"
+    },
+    "chat": {
+      "title": "Sohbet",
+      "start": "Sohbete başla"
+    }
+  }
+  
