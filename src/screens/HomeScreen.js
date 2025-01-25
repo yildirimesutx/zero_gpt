@@ -1,29 +1,55 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeProvider';
-
-
-
+import MainMenu from '../components/MainMenu';
+import InfoSection from '../components/InfoSection';
+import ValuesGrid from '../components/ValuesGrid';
+import Projects from '../components/Projects';
+import BlogPosts from '../components/Blogs';
+import Events from '../components/Events';
 
 const HomeScreen = ({ navigation }) => {
-
-
-    const { t } = useTranslation();
-    const theme = useTheme();
-
-
-
-
+  const { t } = useTranslation();
+  const theme = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-    <Text style={{ color: theme.colors.text }}>
-        Ana Sayfa -Web den gelen component
-      Anlık tema: {theme.colors.background === '#000000' ? 'Dark' : 'Light'}
-    </Text>
+      <ScrollView style={styles.scrollContent}>
+      {/* Menü */}
+      <MainMenu />
 
+      {/* Blog Yazıları */}
+      <View style={styles.section}>
+        <BlogPosts />
+      </View>
+
+      <View style={styles.section}>
+        <InfoSection />
+      </View>
+
+      {/* Etkinlikler */}
+      <View style={styles.section}>
+        <Events />
+      </View>
+
+      <View style={styles.section}>
+      <ValuesGrid/>
+      </View>
+
+    
+
+      {/* Projeler */}
+      <View style={styles.section}>
+        <Projects />
+      </View>
+
+      {/* Alt Değerler */}
+     
+    </ScrollView>
+
+      {/* Sohbet Butonu */}
       <TouchableOpacity
         style={styles.iconButton}
         onPress={() => navigation.navigate('GptPage')}
@@ -34,13 +60,21 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
+export default HomeScreen;
+
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-   
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+    backgroundColor: '#f9f9f9',
+  },
+
+  section: {
+    marginBottom: 20, // Her bölüm arasına boşluk
+    paddingHorizontal: 10, // Yandan boşluklar
+  },
   iconButton: {
     position: 'absolute',
     bottom: 20,
@@ -51,7 +85,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'tomato',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 1,
   },
 });
-
-export default HomeScreen;
