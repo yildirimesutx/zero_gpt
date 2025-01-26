@@ -1,83 +1,101 @@
-// src/screens/GptPage.js
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import PastTopics from './PastTopics';
-import ChatPage from './ChatPage';
-import News from './News';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React, { useState } from 'react';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
+import { View, Text, StyleSheet } from 'react-native';
+import ChatPage from './ChatPage'; // Chat bileşeni
+import HomeScreen from './HomeScreen'; // Ana sayfa bileşeni
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { useTheme } from '../theme/ThemeProvider';
-// i18n import
-import i18n from '../i18n/i18n';
-
-const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
 const GptPage = () => {
-  const theme = useTheme();
+  const [topics] = useState([
+    { id: 'topic1', title: 'Doğal Kaynakların Korunması' },
+    { id: 'topic2', title: 'Atık Yönetimi Stratejileri' },
+    { id: 'topic3', title: 'Geri Dönüşüm Bilinci' },
+  ]);
 
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarActiveTintColor: theme.colors.tabBarActive,
-        tabBarInactiveTintColor: theme.colors.tabBarInactive,
-        tabBarStyle: {
-          backgroundColor: theme.colors.tabBackground,
-          height: 100,
-          borderTopWidth: 0,
-        },
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          if (route.name === 'PastTopics') {
-            iconName = 'time';
-          } else if (route.name === 'ZeroGPT') {
-            iconName = 'chatbubble';
-          } else if (route.name === 'News') {
-            iconName = 'newspaper';
-          }
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
+    <Drawer.Navigator
+      initialRouteName="ChatPage" // Varsayılan olarak ChatPage başlatılacak
+      drawerContent={(props) => <CustomDrawerContent {...props} topics={topics} />}
+      screenOptions={{
+        drawerActiveTintColor: '#004d00',
+        drawerInactiveTintColor: '#666',
+        drawerStyle: {
+          backgroundColor: '#f5f5f5',
         },
         headerStyle: {
-          backgroundColor: theme.colors.headerBg,
+          backgroundColor: '#f5f5f5',
         },
-        headerTintColor: theme.colors.headerText,
+        headerTintColor: '#000',
         headerTitleAlign: 'center',
-      })}
+      }}
     >
-      <Tab.Screen
-        name="PastTopics"
-        component={PastTopics}
-        options={{
-          // i18n'den gelen çeviri
-          tabBarLabel: i18n.t('pastTopics'), 
-          headerTitleAlign: 'center',
-        }}
-      />
-
-      <Tab.Screen
-        name="ZeroGPT"
+      {/* Chat Sayfası */}
+      <Drawer.Screen
+        name="ChatPage"
         component={ChatPage}
         options={{
-          // Burada sabit "ZeroGpt"
-          tabBarLabel: 'ZeroGpt',
-          headerShadowVisible: false,
-          headerTitleAlign: 'center',
+          title: 'ZeroGPT',
+          headerStyle: {
+            elevation: 0, // Android için gölgeyi kaldırır
+            shadowOpacity: 0, // iOS için gölgeyi kaldırır
+          },
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="chatbubble" size={size} color={color} />
+          ),
         }}
+      />
+    </Drawer.Navigator>
+  );
+};
+
+// Özel Drawer İçeriği
+const CustomDrawerContent = (props) => {
+  const { topics, navigation } = props;
+
+  return (
+    <DrawerContentScrollView {...props}>
+      {/* Ana Sayfa Yönlendirmesi */}
+      <DrawerItem
+        label="Ana Sayfa"
+        onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }] })} // Ana Sayfa'ya yönlendirme
+        icon={({ color, size }) => <Ionicons name="home" size={size} color={color} />}
       />
 
-      <Tab.Screen
-        name="News"
-        component={News}
-        options={{
-          // i18n'den gelen çeviri
-          tabBarLabel: i18n.t('news'), 
-          headerTitleAlign: 'center',
-        }}
-      />
-    </Tab.Navigator>
+      {/* Çizgi */}
+      <View style={styles.divider} />
+
+      {/* Sohbetler Başlığı */}
+      <Text style={styles.sectionTitle}>Sohbetler</Text>
+
+      {/* Geçmiş Topics Listesi */}
+      {topics.map((topic, index) => (
+        <DrawerItem
+          key={index}
+          label={topic.title}
+          onPress={() => navigation.navigate('ChatPage', { topicId: topic.id })}
+          icon={({ color, size }) => <Ionicons name="chatbubbles" size={size} color={color} />}
+        />
+      ))}
+    </DrawerContentScrollView>
   );
 };
 
 export default GptPage;
+
+const styles = StyleSheet.create({
+  divider: {
+    height: 1,
+    backgroundColor: '#ddd',
+    marginVertical: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginLeft: 16,
+    marginTop: 10,
+    marginBottom: 5,
+  },
+});

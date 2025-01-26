@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeProvider';
@@ -9,6 +9,7 @@ import ValuesGrid from '../components/ValuesGrid';
 import Projects from '../components/Projects';
 import BlogPosts from '../components/Blogs';
 import Events from '../components/Events';
+import AIAssistantSection from '../components/AIAssistantSection';
 
 const HomeScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -16,45 +17,47 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <ScrollView style={styles.scrollContent}>
-      {/* Menü */}
-      <MainMenu />
+      <ScrollView style={styles.scrollContent} nestedScrollEnabled={true}>
+        {/* Menü */}
+        <MainMenu />
 
-      {/* Blog Yazıları */}
-      <View style={styles.section}>
-        <BlogPosts />
-      </View>
+        {/* AI Asistan */}
+        <View style={styles.sectionAI}>
+          <AIAssistantSection navigation={navigation} />
+        </View>
 
-      <View style={styles.section}>
-        <InfoSection />
-      </View>
+        {/* Blog Yazıları */}
+        <View style={styles.section}>
+          <BlogPosts />
+        </View>
 
-      {/* Etkinlikler */}
-      <View style={styles.section}>
-        <Events />
-      </View>
+        {/* Bilgi Bölümü */}
+        <View style={styles.section}>console.log('HomeScreen component rendered');
+          <InfoSection />
+        </View>
 
-      <View style={styles.section}>
-      <ValuesGrid/>
-      </View>
+        {/* Etkinlikler */}
+        <View style={styles.section}>
+          <Events />
+        </View>
 
-    
+        {/* Değerler Grid */}
+        <View style={styles.section}>
+          <ValuesGrid />
+        </View>
 
-      {/* Projeler */}
-      <View style={styles.section}>
-        <Projects />
-      </View>
+        {/* Projeler */}
+        <View style={styles.section}>
+          <Projects />
+        </View>
+      </ScrollView>
 
-      {/* Alt Değerler */}
-     
-    </ScrollView>
-
-      {/* Sohbet Butonu */}
+      {/* Sohbet Düğmesi */}
       <TouchableOpacity
         style={styles.iconButton}
         onPress={() => navigation.navigate('GptPage')}
       >
-        <Ionicons name="chatbubble-ellipses" size={30} color="#fff" />
+        <Image source={require('../../assets/robot.png')} style={styles.image} />
       </TouchableOpacity>
     </View>
   );
@@ -70,10 +73,19 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: '#f9f9f9',
   },
-
   section: {
-    marginBottom: 20, // Her bölüm arasına boşluk
-    paddingHorizontal: 10, // Yandan boşluklar
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  sectionAI: {
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    marginTop: 20,
+  },
+  image: {
+    height: 50,
+    width: 50,
+    resizeMode: 'contain',
   },
   iconButton: {
     position: 'absolute',
@@ -82,7 +94,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'tomato',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,

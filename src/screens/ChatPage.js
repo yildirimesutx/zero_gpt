@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
   bottomContainer: {
     padding: 10,
     backgroundColor: 'transparent',
+    marginBottom: 30
   },
   inputWrapper: {
     flexDirection: 'row',

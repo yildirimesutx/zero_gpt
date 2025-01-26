@@ -49,13 +49,13 @@ const MainMenu = () => {
             <View style={styles.sideMenuContainer}>
               <Text style={styles.menuTitle}>Menü</Text>
               <TouchableOpacity style={styles.menuItem} onPress={() => console.log('Item 1')}>
-                <Text>Menü Item 1</Text>
+                <Text>Haberler</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.menuItem} onPress={() => console.log('Item 2')}>
-                <Text>Menü Item 2</Text>
+                <Text>Blog</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.menuItem} onPress={() => console.log('Item 3')}>
-                <Text>Menü Item 3</Text>
+                <Text>Etkinlikler</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.closeButton} onPress={closeMenu}>
                 <Text style={{ color: '#fff' }}>Kapat</Text>
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginTop: 20,
-    backgroundColor: 'red',
+    backgroundColor: '#16A349',
     alignItems: 'center',
     padding: 10,
     borderRadius: 5,
