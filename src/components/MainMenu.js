@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, SafeAreaView, StatusBar, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Modal,
+  SafeAreaView,
+  StatusBar,
+  Platform,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../theme/ThemeProvider'; // Tema context'inizi import edin
 
 const MainMenu = () => {
   const [menuVisible, setMenuVisible] = useState(false);
+  const theme = useTheme(); // Tema değerlerini alıyoruz
 
   const handleMenuPress = () => {
     setMenuVisible(true);
@@ -17,11 +29,18 @@ const MainMenu = () => {
   return (
     <>
       {/* Status Bar ve Arka Plan Uyumu */}
-      <LinearGradient colors={['#004d00', '#004d00']} style={styles.statusBarBackground}>
-        <StatusBar translucent backgroundColor="#004d00" barStyle="light-content" />
+      <LinearGradient
+        colors={['#004d00', '#004d00']}
+        style={styles.statusBarBackground}
+      >
+        <StatusBar
+          translucent
+          backgroundColor="#004d00"
+          barStyle="light-content"
+        />
       </LinearGradient>
 
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}>
         <View style={styles.containerWrapper}>
           {/* Header ve Karşılama Mesajı */}
           <LinearGradient
@@ -29,16 +48,23 @@ const MainMenu = () => {
             style={styles.headerAndWelcomeContainer}
           >
             <View style={styles.headerContainer}>
-              <Image source={require('../../assets/logo.png')} style={styles.logo} />
+              <Image
+                source={require('../../assets/logo.png')}
+                style={styles.logo}
+              />
               <TouchableOpacity onPress={handleMenuPress}>
                 <MaterialIcons name="menu" size={30} color="#fff" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.welcomeContainer}>
-              <Text style={styles.welcomeText}>Toplulukları Güçlendirerek, Hayatları Dönüştürüyoruz.!</Text>
+              <Text style={styles.welcomeText}>
+                Toplulukları Güçlendirerek, Hayatları Dönüştürüyoruz.!
+              </Text>
               <Text style={styles.subText}>
-                Sıfır Atık'a katılarak fark yaratın. Kurumumuz, çeşitli topluluk projeleri ve girişimleri aracılığıyla hayatları iyileştirmeye kendini adamıştır.
+                Sıfır Atık'a katılarak fark yaratın. Kurumumuz, çeşitli
+                topluluk projeleri ve girişimleri aracılığıyla hayatları iyileştirmeye
+                kendini adamıştır.
               </Text>
             </View>
           </LinearGradient>
@@ -46,19 +72,30 @@ const MainMenu = () => {
           {/* Menü Modal */}
           <Modal visible={menuVisible} transparent={true} animationType="fade">
             <TouchableOpacity style={styles.overlay} onPress={closeMenu} />
-            <View style={styles.sideMenuContainer}>
-              <Text style={styles.menuTitle}>Menü</Text>
-              <TouchableOpacity style={styles.menuItem} onPress={() => console.log('Item 1')}>
-                <Text>Haberler</Text>
+            <View style={[styles.sideMenuContainer, { backgroundColor: theme.colors.background }]}>
+              <Text style={[styles.menuTitle, { color: theme.colors.text }]}>
+                Menü
+              </Text>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => console.log('Item 1')}
+              >
+                <Text style={{ color: theme.colors.text }}>Haberler</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => console.log('Item 2')}>
-                <Text>Blog</Text>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => console.log('Item 2')}
+              >
+                <Text style={{ color: theme.colors.text }}>Blog</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => console.log('Item 3')}>
-                <Text>Etkinlikler</Text>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => console.log('Item 3')}
+              >
+                <Text style={{ color: theme.colors.text }}>Etkinlikler</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.closeButton} onPress={closeMenu}>
-                <Text style={{ color: '#fff' }}>Kapat</Text>
+                <Text style={{ color: theme.colors.text }}>Kapat</Text>
               </TouchableOpacity>
             </View>
           </Modal>
@@ -76,7 +113,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    // Arka plan temadan alınacak, default burada '#fff' idi.
   },
   containerWrapper: {
     flex: 1,
@@ -132,7 +169,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: '100%',
     width: 200,
-    backgroundColor: '#fff',
+    // backgroundColor burada sabit '#fff' idi, artık temadan alınıyor.
     paddingTop: 60,
     paddingHorizontal: 15,
   },
