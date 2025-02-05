@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,17 +7,68 @@ import {
   StyleSheet,
   FlatList,
   Platform,
+  Image,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeProvider';
 import useChatBot from '../hooks/useChatBot';
 import i18n from '../i18n/i18n';
 
 const ChatPage = () => {
   const theme = useTheme();
+  const navigation = useNavigation();
   const { messages, sendMessage, loading } = useChatBot();
   const [inputText, setInputText] = useState('');
   const [dots, setDots] = useState('');
+  // showPrompts: sohbet başladıktan sonra promptların görünmemesi için
+  const [showPrompts, setShowPrompts] = useState(true);
+
+  // Örnek promptlar: her biri iki satırlı (başlık ve açıklama)
+  const prompts = [
+    { 
+      title: "Sıfır Atık Nedir?", 
+      description: "Atık üretimini en aza indirerek çevreyi koruyun." 
+    },
+    { 
+      title: "Geri Dönüşüm", 
+      description: "Kullanılan malzemeleri yeniden değerlendirin." 
+    },
+    { 
+      title: "Sürdürülebilir Yaşam", 
+      description: "Doğayla uyumlu, uzun vadeli çözümler üretin." 
+    },
+    { 
+      title: "Atık Azaltma Yöntemleri", 
+      description: "Günlük hayatınızda atıkları nasıl azaltabilirsiniz?" 
+    },
+    { 
+      title: "Çevre Dostu Ürünler", 
+      description: "Doğal ve çevre dostu ürünler hakkında bilgi edinin." 
+    },
+  ];
+
+  // Header kısmına hamburger menü eklemek için:
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          style={{ marginLeft: 16 }}
+          onPress={() => navigation.toggleDrawer()}
+        >
+          <Ionicons name="menu" size={24} color={theme.colors.headerText} />
+        </TouchableOpacity>
+      ),
+      headerTitle: "ZeroGPT",
+      headerTitleAlign: 'center',
+      headerStyle: {
+        backgroundColor: theme.colors.headerBg,
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+      headerTintColor: theme.colors.headerText,
+    });
+  }, [navigation, theme]);
 
   useEffect(() => {
     if (loading) {
@@ -32,38 +83,66 @@ const ChatPage = () => {
     if (inputText.trim().length === 0) return;
     sendMessage(inputText);
     setInputText('');
+    setShowPrompts(false); // Sohbet başladı, promptları gizle
   };
 
-  const renderMessageItem = ({ item }) => (
-    <View style={[styles.messageContainer, item.sender === 'user' ? styles.userContainer : styles.botContainer]}>
+  // Prompt'a dokunulduğunda: mesaj olarak gönder ve prompt listesini gizle
+  const handlePromptPress = (promptTitle) => {
+    sendMessage(promptTitle);
+    setInputText('');
+    setShowPrompts(false);
+  };
+
+  // Mesaj render fonksiyonu: Bot mesajlarında sol tarafta robot ikonu eklendi
+  const renderMessageItem = ({ item }) => {
+    const isUser = item.sender === 'user';
+    return (
       <View
         style={[
-          styles.messageBubble,
-          item.sender === 'user'
-            ? { backgroundColor: theme.colors.userBubble } // Kullanıcı balon rengi
-            : styles.botMessage,
+          styles.messageContainer,
+          isUser ? styles.userContainer : styles.botContainer,
         ]}
       >
-        <Text
+        {/* Eğer bot mesajı ise sol tarafta robot ikonu göster */}
+        {!isUser && (
+          <Image
+            source={require('../../assets/robot.png')}
+            style={styles.botIcon}
+          />
+        )}
+        <View
           style={[
-            styles.messageText,
-            {
-              color: item.sender === 'user'
-                ? (theme.colors.background === '#FFFFFF' ? '#000' : '#FFF') // Kullanıcı yazı rengi
-                : theme.colors.text,
-            },
+            styles.messageBubble,
+            isUser
+              ? { backgroundColor: theme.colors.userBubble }
+              : styles.botMessage,
           ]}
         >
-          {item.text}
-        </Text>
+          <Text
+            style={[
+              styles.messageText,
+              {
+                color: isUser
+                  ? (theme.colors.background === '#FFFFFF' ? '#000' : '#FFF')
+                  : theme.colors.text,
+              },
+            ]}
+          >
+            {item.text}
+          </Text>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <FlatList
-        data={loading ? [...messages, { id: 'loading', text: `${dots}`, sender: 'bot' }] : messages}
+        data={
+          loading
+            ? [...messages, { id: 'loading', text: `${dots}`, sender: 'bot' }]
+            : messages
+        }
         keyExtractor={(item) => item.id}
         renderItem={({ item }) =>
           item.id === 'loading' ? (
@@ -77,6 +156,34 @@ const ChatPage = () => {
         style={styles.messageList}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
+
+      {/* Input'un Üstünde Prompt Listesi: yalnızca input boşken ve sohbet henüz başlamadıysa göster */}
+      {showPrompts && inputText.trim().length === 0 && (
+        <View style={styles.promptsContainer}>
+          <FlatList
+            data={prompts}
+            horizontal
+            keyExtractor={(item, index) => `${index}`}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.promptItem,
+                  { backgroundColor: theme.colors.inputBg },
+                ]}
+                onPress={() => handlePromptPress(item.title)}
+              >
+                <Text style={[styles.promptTitle, { color: theme.colors.text }]}>
+                  {item.title}
+                </Text>
+                <Text style={[styles.promptDescription, { color: theme.colors.text }]}>
+                  {item.description}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      )}
 
       <View style={styles.bottomContainer}>
         <View
@@ -92,14 +199,27 @@ const ChatPage = () => {
           <TextInput
             style={[styles.textInput, { color: theme.colors.text }]}
             placeholder={i18n.t('placeholder_message')}
-            placeholderTextColor={theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'}
+            placeholderTextColor={
+              theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'
+            }
             value={inputText}
-            onChangeText={setInputText}
+            onChangeText={(text) => {
+              setInputText(text);
+              if (text.trim().length > 0) {
+                setShowPrompts(false);
+              }
+            }}
             multiline
           />
 
-          <TouchableOpacity onPress={handleSend} style={[styles.iconWrapper, { backgroundColor: theme.colors.primary }]}>
-            <Ionicons name="send" size={20} color={'#FFF'} />
+          <TouchableOpacity
+            onPress={handleSend}
+            style={[
+              styles.iconWrapper,
+              { backgroundColor: theme.colors.primary },
+            ]}
+          >
+            <Ionicons name="send" size={20} color="#FFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -120,12 +240,20 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     marginVertical: 5,
-  },
-  userContainer: {
+    flexDirection: 'row',
     alignItems: 'flex-end',
   },
+  userContainer: {
+    alignSelf: 'flex-end',
+  },
   botContainer: {
-    alignItems: 'flex-start',
+    alignSelf: 'flex-start',
+  },
+  botIcon: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain',
+    marginRight: 8,
   },
   messageBubble: {
     padding: 12,
@@ -143,7 +271,6 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     padding: 10,
-    backgroundColor: 'transparent',
     marginBottom: 30,
   },
   inputWrapper: {
@@ -165,12 +292,29 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 20,
   },
-  // **📌 Loading animasyonu için büyük nokta stili**
   loadingText: {
-    fontSize: 24, // **Daha büyük nokta büyüklüğü**
+    fontSize: 24,
     fontWeight: 'bold',
-    
     paddingHorizontal: 16,
     textAlign: 'left',
+  },
+  promptsContainer: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  promptItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    marginRight: 8,
+    minWidth: 150,
+  },
+  promptTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  promptDescription: {
+    fontSize: 12,
+    marginTop: 2,
   },
 });

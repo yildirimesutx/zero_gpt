@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
 import { View, Text, StyleSheet } from 'react-native';
-import ChatPage from './ChatPage'; // Chat bileşeni
-import HomeScreen from './HomeScreen'; // Ana sayfa bileşeni
+import ChatPage from './ChatPage'; // Örnek: Chat bileşeni (ZeroGPT ekranı)
+import HomeScreen from './HomeScreen'; // Örnek: Ana sayfa bileşeni
+// import SettingsScreen from './SettingsScreen'; // Ayarlar ekranı (kendi oluşturduğunuz bileşen)
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '../theme/ThemeProvider'; // Tema context'inizi import edin
 
@@ -15,35 +16,26 @@ const Drawer = createDrawerNavigator();
 const GptPage = () => {
   const theme = useTheme();
 
-  const [topics] = useState([
-    { id: 'topic1', title: 'Doğal Kaynakların Korunması' },
-    { id: 'topic2', title: 'Atık Yönetimi Stratejileri' },
-    { id: 'topic3', title: 'Geri Dönüşüm Bilinci' },
-  ]);
-
   return (
     <Drawer.Navigator
       initialRouteName="ChatPage"
-      drawerContent={(props) => (
-        <CustomDrawerContent {...props} topics={topics} />
-      )}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
-        // Drawer renk ayarları
         drawerActiveTintColor: theme.colors.primary,
         drawerInactiveTintColor: theme.colors.text,
         drawerStyle: {
           backgroundColor: theme.colors.background,
         },
-        // Header ayarları: temadan gelen değerler kullanılıyor
         headerStyle: {
           backgroundColor: theme.colors.headerBg,
-          elevation: 0,     // Android: gölgeyi kaldırır
-          shadowOpacity: 0, // iOS: gölgeyi kaldırır
+          elevation: 0,     // Android gölgesini kaldırır
+          shadowOpacity: 0, // iOS gölgesini kaldırır
         },
         headerTintColor: theme.colors.headerText,
         headerTitleAlign: 'center',
       }}
     >
+      {/* Örnek ekranlar */}
       <Drawer.Screen
         name="ChatPage"
         component={ChatPage}
@@ -54,54 +46,114 @@ const GptPage = () => {
           ),
         }}
       />
+      <Drawer.Screen
+        name="Haberler"
+        component={HomeScreen} // Haberler ekranı bileşeni (örnek olarak HomeScreen kullanıldı)
+        options={{
+          title: 'Haberler',
+          drawerIcon: ({ size }) => (
+            <Ionicons name="newspaper" size={size} color={theme.colors.text} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Blog"
+        component={HomeScreen} // Blog ekranı bileşeni (örnek olarak HomeScreen kullanıldı)
+        options={{
+          title: 'Blog',
+          drawerIcon: ({ size }) => (
+            <Ionicons name="book" size={size} color={theme.colors.text} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Etkinlikler"
+        component={HomeScreen} // Etkinlikler ekranı bileşeni (örnek olarak HomeScreen kullanıldı)
+        options={{
+          title: 'Etkinlikler',
+          drawerIcon: ({ size }) => (
+            <Ionicons name="calendar" size={size} color={theme.colors.text} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Settings"
+        component={HomeScreen} // Ayarlar ekranı bileşeni
+        options={{
+          title: 'Ayarlar',
+          drawerIcon: ({ size }) => (
+            <Ionicons name="settings" size={size} color={theme.colors.text} />
+          ),
+        }}
+      />
     </Drawer.Navigator>
   );
 };
 
-// Özel Drawer İçeriği
+// Custom Drawer İçeriği
 const CustomDrawerContent = (props) => {
   const theme = useTheme();
-  const { topics, navigation } = props;
+  const { navigation } = props;
 
   return (
-    <DrawerContentScrollView {...props}>
-      {/* Ana Sayfa Yönlendirmesi */}
-      <DrawerItem
-        label="Ana Sayfa"
-        labelStyle={{ color: theme.colors.text }}
-        onPress={() =>
-          navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
-        }
-        icon={({ size }) => (
-          <Ionicons name="home" size={size} color={theme.colors.text} />
-        )}
-      />
-
-      <View style={styles.divider} />
-
-      {/* Sohbetler Başlığı */}
-      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-        Sohbetler
-      </Text>
-
-      {/* Konu (topic) listesi */}
-      {topics.map((topic, index) => (
+    <DrawerContentScrollView
+      {...props}
+      contentContainerStyle={{ flex: 1, justifyContent: 'space-between' }}
+    >
+      <View>
+        {/* Ana Sayfa Yönlendirmesi */}
         <DrawerItem
-          key={index}
-          label={topic.title}
+          label="Ana Sayfa"
           labelStyle={{ color: theme.colors.text }}
-          onPress={() =>
-            navigation.navigate('ChatPage', { topicId: topic.id })
-          }
+          onPress={() => navigation.navigate('Home')}
           icon={({ size }) => (
-            <Ionicons
-              name="chatbubbles"
-              size={size}
-              color={theme.colors.text}
-            />
+            <Ionicons name="home" size={size} color={theme.colors.text} />
           )}
         />
-      ))}
+
+        <View style={styles.divider} />
+
+        {/* Menü Başlığı */}
+        <Text style={[styles.menuTitle, { color: theme.colors.text }]}>
+          Menü
+        </Text>
+
+        {/* Sabit Menü Öğeleri */}
+        <DrawerItem
+          label="Haberler"
+          labelStyle={{ color: theme.colors.text }}
+          onPress={() => navigation.navigate('Haberler')}
+          icon={({ size }) => (
+            <Ionicons name="newspaper" size={size} color={theme.colors.text} />
+          )}
+        />
+        <DrawerItem
+          label="Blog"
+          labelStyle={{ color: theme.colors.text }}
+          onPress={() => navigation.navigate('Blog')}
+          icon={({ size }) => (
+            <Ionicons name="book" size={size} color={theme.colors.text} />
+          )}
+        />
+        <DrawerItem
+          label="Etkinlikler"
+          labelStyle={{ color: theme.colors.text }}
+          onPress={() => navigation.navigate('Etkinlikler')}
+          icon={({ size }) => (
+            <Ionicons name="calendar" size={size} color={theme.colors.text} />
+          )}
+        />
+      </View>
+
+      {/* En Alt Kısımda Ayarlar Menüsü */}
+      <DrawerItem
+        label="Ayarlar"
+        labelStyle={{ color: theme.colors.text }}
+        onPress={() => navigation.navigate('Setting')}
+        icon={({ size }) => (
+          <Ionicons name="settings" size={size} color={theme.colors.text} />
+        )}
+      />
     </DrawerContentScrollView>
   );
 };
@@ -114,11 +166,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
     marginVertical: 10,
   },
-  sectionTitle: {
-    fontSize: 16,
+  menuTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 16,
-    marginTop: 10,
-    marginBottom: 5,
+    marginVertical: 10,
   },
 });
