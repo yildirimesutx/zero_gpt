@@ -3,5 +3,8 @@
     "welcome": "Welcome to our app!",
     "placeholder_message": "Type your message here...",
     "pastTopics": "Past Topics",
-    "news": "News"
+    "news": "News",
+    "login" : "Login",
+    "login_google": "Login with Google",
+    "placeholder_pass" : "Şifre"
   }

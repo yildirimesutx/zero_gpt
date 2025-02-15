@@ -101,7 +101,7 @@ const CustomDrawerContent = (props) => {
       contentContainerStyle={{ flex: 1, justifyContent: 'space-between' }}
     >
       <View>
-        {/* Ana Sayfa Yönlendirmesi */}
+        {/* Ana Sayfa Yönlendirmesi.. */}
         <DrawerItem
           label="Ana Sayfa"
           labelStyle={{ color: theme.colors.text }}

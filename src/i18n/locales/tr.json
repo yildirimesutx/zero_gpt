@@ -3,7 +3,10 @@
     "welcome": "Uygulamamıza hoş geldiniz!",
     "placeholder_message": "Mesajınızı buraya yazın...",
     "pastTopics": "Geçmiş",
-    "news": "Haberler"
+    "news": "Haberler",
+    "login": "Giriş Yap",
+    "login_google" : "Google ile Devam Et",
+    "placeholder_pass" : "Şifre"
   }
   
   

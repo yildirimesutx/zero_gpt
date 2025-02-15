@@ -14,6 +14,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeProvider';
 import useChatBot from '../hooks/useChatBot';
 import i18n from '../i18n/i18n';
+// Alternatif olarak resmi import edin:
+import robotAssistant from '../../assets/robot-assistant.png';
 
 const ChatPage = () => {
   const theme = useTheme();
@@ -157,6 +159,16 @@ const ChatPage = () => {
         contentContainerStyle={{ paddingBottom: 20 }}
       />
 
+      {/* Orta kısımda soluk renkli "robot-assistant" resmi:
+          Yalnızca promptlar görünürken (input boş ve showPrompts true) gösterilir */}
+      {showPrompts && inputText.trim().length === 0 && (
+        <Image
+          source={robotAssistant}
+          style={styles.assistantImage}
+          pointerEvents="none"
+        />
+      )}
+
       {/* Input'un Üstünde Prompt Listesi: yalnızca input boşken ve sohbet henüz başlamadıysa göster */}
       {showPrompts && inputText.trim().length === 0 && (
         <View style={styles.promptsContainer}>
@@ -232,6 +244,7 @@ export default ChatPage;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: 'relative', // Absolute konumlandırılmış öğeler için
   },
   messageList: {
     flex: 1,
@@ -241,13 +254,14 @@ const styles = StyleSheet.create({
   messageContainer: {
     marginVertical: 5,
     flexDirection: 'row',
-    alignItems: 'flex-end',
   },
   userContainer: {
     alignSelf: 'flex-end',
+    alignItems: 'flex-end',
   },
   botContainer: {
     alignSelf: 'flex-start',
+    alignItems: 'flex-start',
   },
   botIcon: {
     width: 30,
@@ -316,5 +330,16 @@ const styles = StyleSheet.create({
   promptDescription: {
     fontSize: 12,
     marginTop: 2,
+  },
+  assistantImage: {
+    position: 'absolute',
+    top: '25%', // Bu değeri düşürerek resmi daha yukarı alabilirsiniz.
+    alignSelf: 'center',
+    opacity: 0.5,
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+    zIndex: 2,
+    pointerEvents: 'none',
   },
 });
