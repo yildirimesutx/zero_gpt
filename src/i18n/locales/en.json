@@ -6,5 +6,14 @@
     "news": "News",
     "login" : "Login",
     "login_google": "Login with Google",
-    "placeholder_pass" : "Password"
+    "placeholder_pass" : "Password",
+    "about_us": "About Us",
+    "about_page_content-1": "The Zero Waste Foundation was established in 2023 under the patronage of Emine Erdoğan, the wife of President Recep Tayyip Erdoğan.",
+    "about_page_content-2":   "The foundation operates to promote and ensure the sustainability of the Zero Waste Project. It works to encourage every individual and institution to adopt a zero waste mindset, aiming to create an environmentally conscious society.",
+    
+    "about_page_content-3":  "Among the foundation's core objectives are increasing awareness of zero waste, encouraging the sharing of knowledge and experience, and developing and disseminating practices in this field.",
+    
+    "about_page_content-4":  "In pursuit of these goals, comprehensive efforts are underway in education, research, project development, and implementation. Collaborative initiatives with public institutions, the private sector, and non-governmental organizations are continuously carried out to implement zero waste practices across all areas, while zero waste projects are promoted internationally to create a global impact."
+   
+
   }

@@ -81,7 +81,7 @@ const MainMenu = () => {
 
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => navigation.navigate('NewsScreen')}
+                onPress={() => navigation.navigate('AboutUsScreen')}
               >
                 <Text style={{ color: theme.colors.text }}>Hakkımızda</Text>
               </TouchableOpacity>

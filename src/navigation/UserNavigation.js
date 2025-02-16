@@ -9,6 +9,7 @@ import NewDetail from '../screens/NewsDetailScreen';
 import NewsDetailScreen from '../screens/NewsDetailScreen';
 import BlogsDetailScreen from '../screens/BlogsDetailScreen';
 import ProjectDetailScreen from '../screens/ProjectDetailScreen';
+import AboutUsScreen from '../screens/AboutUsScreen';
 
 const Stack = createStackNavigator();
 
@@ -63,6 +64,14 @@ const UserNavigation = () => {
         component={ProjectDetailScreen}
         options={{ headerShown: false }}
       /> 
+
+      <Stack.Screen
+        name="AboutUsScreen"
+        component={AboutUsScreen}
+        options={{ headerShown: false }}
+      /> 
+
+
 
          
 
