@@ -95,6 +95,8 @@ const ChatPage = () => {
     setShowPrompts(false);
   };
 
+  console.log("messages", messages)
+
   // Mesaj render fonksiyonu: Bot mesajlarında sol tarafta robot ikonu eklendi
   const renderMessageItem = ({ item }) => {
     const isUser = item.sender === 'user';

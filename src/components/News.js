@@ -1,4 +1,4 @@
-// src/screens/BlogPosts.js
+// src/screens/News.js
 import React from 'react';
 import { 
   View, 
@@ -9,30 +9,29 @@ import {
   Dimensions, 
   ActivityIndicator 
 } from 'react-native';
-import useBlogs from '../hooks/useBlogs';
+import useNews from '../hooks/useNews';
 import { MEDIA_URL } from '../hooks/baseURL';
 
-const BlogPosts = () => {
-  const { blogs, loading, error } = useBlogs();
+const News = () => {
+  const { news, loading, error } = useNews();
   const { width } = Dimensions.get('window');
 
-  const renderItem = ({ item }) => {
-    // Tarihi formatlamak için örneğin toLocaleDateString kullanabilirsiniz.
-    const publishedDate = new Date(item.createdAt).toLocaleDateString();
 
-    return (
-      <View style={[styles.card, { width: width * 0.8 }]}>
-        {/* Üst Yarı: Blog resmi */}
-        <Image source={{ uri: MEDIA_URL + item.image }} style={styles.blogImage} />
-        {/* Alt Yarı: İçerik */}
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.date}>{publishedDate}</Text>
-          <Text style={styles.category}>{item.category.name}</Text>
-        </View>
+  console.log("news", news)
+
+  const renderItem = ({ item }) => (
+    <View style={[styles.card, { width: width * 0.8 }]}>
+      {/* Üst kısmın %70'i: Haber resmi */}
+      <Image 
+        source={{ uri: MEDIA_URL + item.image }}
+        style={styles.image}
+      />
+      {/* Alt kısım: Sadece başlık */}
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>{item.title}</Text>
       </View>
-    );
-  };
+    </View>
+  );
 
   if (loading) {
     return <ActivityIndicator style={styles.loading} size="large" color="#004d00" />;
@@ -44,9 +43,9 @@ const BlogPosts = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Blog Yazılarımız</Text>
+      <Text style={styles.heading}>Haberler</Text>
       <FlatList
-        data={blogs}
+        data={news}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         horizontal
@@ -60,13 +59,13 @@ const BlogPosts = () => {
   );
 };
 
-export default BlogPosts;
+export default News;
 
 const styles = StyleSheet.create({
   container: {
     marginTop: 20,
     paddingVertical: 20,
-    backgroundColor: '#e3f2fd', // Örnek arka plan; ihtiyacınıza göre düzenleyebilirsiniz.
+    backgroundColor: '#f0f0f0', // İhtiyaca göre ayarlanabilir arka plan
     borderRadius: 15,
     marginHorizontal: 10,
   },
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#0d47a1', // Koyu mavi başlık rengi
+    color: '#333',
     marginBottom: 20,
   },
   flatListContent: {
@@ -90,33 +89,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 4,
-    height: 300,
+    height: 250,
   },
-  blogImage: {
+  image: {
     width: '100%',
-    height: '65%', // Kartın üst yarısı resim için
+    height: '70%', // Üst %70 resim için
   },
   contentContainer: {
-    padding: 15,
+    padding: 10,
+    height: '30%', // Alt %30 içerik için
     justifyContent: 'center',
-    alignItems: 'flex-start',
-    height: '35%',
+    alignItems: 'center',
   },
   title: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#004d00',
-    marginBottom: 5,
-  },
-  date: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 5,
-  },
-  category: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    textAlign: 'center',
   },
   loading: {
     marginTop: 20,

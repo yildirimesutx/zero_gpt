@@ -11,32 +11,46 @@ const useChatBot = () => {
   const sendMessage = async (userMessage) => {
     if (!userMessage.trim()) return;
 
+    // Kullanıcı mesajı için ID üretimi: sadece metin gönderiliyor.
+    const userMessageId = Date.now();
     const newUserMessage = {
-      id: Date.now().toString(),
+      id: userMessageId.toString(),
       text: userMessage,
       sender: 'user',
     };
 
+    // API isteği yapılmadan önce yerel mesaj state güncelleniyor.
     setMessages((prev) => [...prev, newUserMessage]);
     setLoading(true);
 
     try {
-      const response = await fetch(API_URL, {
+      // API_KEY artık URL parametresi olarak ekleniyor.
+      const response = await fetch(`${API_URL}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${API_KEY}`,
+          'x-functions-key' : API_KEY
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: userMessage }],
+          "user-prompt": userMessage,
+          "message-id": userMessageId,
         }),
       });
 
-      const data = await response.json();
+      // Yanıtı önce text olarak okuyup, sonra JSON'a çeviriyoruz.
+      const responseText = await response.text();
+      let data = {};
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (parseError) {
+        console.error('JSON Parse Error:', parseError, 'Response text:', responseText);
+      }
+
+      // API response formatı:
+      // { "message_id": 1, "response": "Cevap metni..." }
       const botReply = {
-        id: Date.now().toString() + '-bot',
-        text: data.choices[0].message.content || 'Cevap alınamadı.',
+        id: data.message_id ? data.message_id.toString() + '-bot' : Date.now().toString() + '-bot',
+        text: data.response || 'Cevap alınamadı.',
         sender: 'bot',
       };
 

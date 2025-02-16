@@ -10,6 +10,7 @@ import Projects from '../components/Projects';
 import BlogPosts from '../components/Blogs';
 import Events from '../components/Events';
 import AIAssistantSection from '../components/AIAssistantSection';
+import News from '../components/News';
 
 const HomeScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -36,6 +37,16 @@ const HomeScreen = ({ navigation }) => {
           <InfoSection />
         </View>
 
+            {/* Projeler */}
+        <View style={styles.section}>
+          <News />
+        </View>
+
+          {/* Projeler */}
+        <View style={styles.section}>
+          <Projects />
+        </View>
+
         {/* Etkinlikler */}
         <View style={styles.section}>
           <Events />
@@ -46,10 +57,7 @@ const HomeScreen = ({ navigation }) => {
           <ValuesGrid />
         </View>
 
-        {/* Projeler */}
-        <View style={styles.section}>
-          <Projects />
-        </View>
+      
       </ScrollView>
 
       {/* Sohbet Düğmesi */}
