@@ -13,10 +13,12 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../theme/ThemeProvider'; // Tema context'inizi import edin
+import { useNavigation } from '@react-navigation/native';
 
 const MainMenu = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const theme = useTheme(); // Tema değerlerini alıyoruz
+  const navigation = useNavigation();
 
   const handleMenuPress = () => {
     setMenuVisible(true);
@@ -76,23 +78,31 @@ const MainMenu = () => {
               <Text style={[styles.menuTitle, { color: theme.colors.text }]}>
                 Menü
               </Text>
+
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => console.log('Item 1')}
+                onPress={() => navigation.navigate('NewsScreen')}
+              >
+                <Text style={{ color: theme.colors.text }}>Hakkımızda</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => navigation.navigate('NewsScreen')}
               >
                 <Text style={{ color: theme.colors.text }}>Haberler</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => console.log('Item 2')}
+                onPress={() => navigation.navigate('BlogsScreen')}
               >
                 <Text style={{ color: theme.colors.text }}>Blog</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => console.log('Item 3')}
+                onPress={() => navigation.navigate('ProjectsScreen')}
               >
-                <Text style={{ color: theme.colors.text }}>Etkinlikler</Text>
+                <Text style={{ color: theme.colors.text }}>Projeler</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.closeButton} onPress={closeMenu}>
                 <Text style={{ color: theme.colors.text }}>Kapat</Text>

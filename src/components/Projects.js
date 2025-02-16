@@ -7,22 +7,29 @@ import {
   FlatList, 
   Image, 
   Dimensions, 
-  ActivityIndicator 
+  ActivityIndicator,
+  TouchableOpacity 
 } from 'react-native';
 import useProjects from '../hooks/useProjects';
 import { MEDIA_URL } from '../hooks/baseURL';
+import { useNavigation } from '@react-navigation/native';
 
 const ModernProjects = () => {
   const { projects, loading, error } = useProjects();
   const { width } = Dimensions.get('window');
+  const navigation = useNavigation();
 
-  console.log("projects", projects)
 
   const renderItem = ({ item }) => {
     // Oluşturulma tarihini locale formatında gösterelim.
     const publishedDate = new Date(item.createdAt).toLocaleDateString();
 
+    
     return (
+      <TouchableOpacity 
+            onPress={() => navigation.navigate('ProjectDetailScreen', { slug: item.slug })}
+            activeOpacity={0.8}
+          >
       <View style={[styles.card, { width: width * 0.7 }]}>
         {/* Üst %60: Gallery'nin ilk resmi */}
         <Image 
@@ -36,6 +43,7 @@ const ModernProjects = () => {
           {item.isActive && <Text style={styles.active}>Devam Ediyor</Text>}
         </View>
       </View>
+      </TouchableOpacity>
     );
   };
 
@@ -49,7 +57,14 @@ const ModernProjects = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Projelerimiz</Text>
+
+      <View style={styles.header}>
+        <Text style={styles.heading}>Projelerimiz</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('ProjectsScreen')}>
+            <Text style={styles.link}>Tüm Projeler</Text>
+          </TouchableOpacity>
+      </View>
+
       <FlatList
         data={projects}
         keyExtractor={(item) => item.id.toString()}
@@ -75,12 +90,22 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginHorizontal: 10,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
+    color: '#333',
+  },
+  link: {
+    fontSize: 14,
     color: '#004d00',
-    marginBottom: 20,
+    textDecorationLine: 'underline',
   },
   flatListContent: {
     paddingHorizontal: 10,

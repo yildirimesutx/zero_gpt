@@ -2,6 +2,13 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import GptPage from '../screens/GptPage';
+import NewsScreen from '../screens/NewsScreen';
+import BlogsScreen from '../screens/BlogsScreen';
+import ProjectsScreen from '../screens/ProjectsScreen';
+import NewDetail from '../screens/NewsDetailScreen';
+import NewsDetailScreen from '../screens/NewsDetailScreen';
+import BlogsDetailScreen from '../screens/BlogsDetailScreen';
+import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -20,6 +27,47 @@ const UserNavigation = () => {
         component={HomeScreen}
         options={{ headerShown: false }}
       />
+
+      <Stack.Screen
+        name="NewsScreen"
+        component={NewsScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="BlogsScreen"
+        component={BlogsScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="ProjectsScreen"
+        component={ProjectsScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="NewsDetailScreen"
+        component={NewsDetailScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="BlogsDetailScreen"
+        component={BlogsDetailScreen}
+        options={{ headerShown: false }}
+      /> 
+
+      <Stack.Screen
+        name="ProjectDetailScreen"
+        component={ProjectDetailScreen}
+        options={{ headerShown: false }}
+      /> 
+
+         
+
+
+
     </Stack.Navigator>
   );
 };

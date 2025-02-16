@@ -7,30 +7,37 @@ import {
   FlatList, 
   Image, 
   Dimensions, 
-  ActivityIndicator 
+  ActivityIndicator,
+  TouchableOpacity 
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import useNews from '../hooks/useNews';
 import { MEDIA_URL } from '../hooks/baseURL';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 const News = () => {
   const { news, loading, error } = useNews();
   const { width } = Dimensions.get('window');
-
-
-  console.log("news", news)
+  const navigation = useNavigation();
 
   const renderItem = ({ item }) => (
-    <View style={[styles.card, { width: width * 0.8 }]}>
-      {/* Üst kısmın %70'i: Haber resmi */}
-      <Image 
-        source={{ uri: MEDIA_URL + item.image }}
-        style={styles.image}
-      />
-      {/* Alt kısım: Sadece başlık */}
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>{item.title}</Text>
+    <TouchableOpacity 
+      onPress={() => navigation.navigate('NewsDetailScreen', { slug: item.slug })}
+      activeOpacity={0.8}
+    >
+      <View style={[styles.card, { width: width * 0.8 }]}>
+        {/* Üst kısmın %70'i: Haber resmi */}
+        <Image 
+          source={{ uri: MEDIA_URL + item.image }}
+          style={styles.image}
+        />
+        {/* Alt kısım: Sadece başlık */}
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>{item.title}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading) {
@@ -43,7 +50,14 @@ const News = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Haberler</Text>
+      {/* Header: Başlık ve "Tüm Haberler" linki */}
+      <View style={styles.header}>
+        <Text style={styles.heading}>Haberler</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('NewsScreen')}>
+          <Text style={styles.link}>Tüm Haberler</Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={news}
         keyExtractor={(item) => item.id.toString()}
@@ -54,6 +68,7 @@ const News = () => {
         snapToAlignment="start"
         snapToInterval={width * 0.8 + 20}
         decelerationRate="fast"
+        keyboardShouldPersistTaps="always"
       />
     </View>
   );
@@ -69,12 +84,22 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginHorizontal: 10,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
     color: '#333',
-    marginBottom: 20,
+  },
+  link: {
+    fontSize: 14,
+    color: '#004d00',
+    textDecorationLine: 'underline',
   },
   flatListContent: {
     paddingHorizontal: 10,

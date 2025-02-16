@@ -7,20 +7,27 @@ import {
   FlatList, 
   Image, 
   Dimensions, 
-  ActivityIndicator 
+  ActivityIndicator,
+  TouchableOpacity 
 } from 'react-native';
 import useBlogs from '../hooks/useBlogs';
 import { MEDIA_URL } from '../hooks/baseURL';
+import { useNavigation } from '@react-navigation/native';
 
 const BlogPosts = () => {
   const { blogs, loading, error } = useBlogs();
   const { width } = Dimensions.get('window');
+  const navigation = useNavigation();
 
   const renderItem = ({ item }) => {
     // Tarihi formatlamak için örneğin toLocaleDateString kullanabilirsiniz.
     const publishedDate = new Date(item.createdAt).toLocaleDateString();
 
     return (
+       <TouchableOpacity 
+            onPress={() => navigation.navigate('BlogsDetailScreen', { slug: item.slug })}
+            activeOpacity={0.8}
+          >
       <View style={[styles.card, { width: width * 0.8 }]}>
         {/* Üst Yarı: Blog resmi */}
         <Image source={{ uri: MEDIA_URL + item.image }} style={styles.blogImage} />
@@ -31,6 +38,7 @@ const BlogPosts = () => {
           <Text style={styles.category}>{item.category.name}</Text>
         </View>
       </View>
+      </TouchableOpacity>
     );
   };
 
@@ -44,7 +52,14 @@ const BlogPosts = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Blog Yazılarımız</Text>
+
+      <View style={styles.header}>
+        <Text style={styles.heading}>Blog Yazılarımız</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('BlogsScreen')}>
+          <Text style={styles.link}>Tüm Yazılar</Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={blogs}
         keyExtractor={(item) => item.id.toString()}
@@ -70,12 +85,29 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginHorizontal: 10,
   },
+  // heading: {
+  //   fontSize: 20,
+  //   fontWeight: 'bold',
+  //   textAlign: 'center',
+  //   color: '#0d47a1', // Koyu mavi başlık rengi
+  //   marginBottom: 20,
+  // },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#0d47a1', // Koyu mavi başlık rengi
-    marginBottom: 20,
+    color: '#333',
+  },
+  link: {
+    fontSize: 14,
+    color: '#004d00',
+    textDecorationLine: 'underline',
   },
   flatListContent: {
     paddingHorizontal: 10,
