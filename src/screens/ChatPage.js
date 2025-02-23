@@ -8,6 +8,7 @@ import {
   FlatList,
   Platform,
   Image,
+  Alert
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -17,26 +18,27 @@ import i18n from '../i18n/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import robotAssistant from '../../assets/robot-assistant.png';
 
+// YENİ HOOK
+import useChatHistoricPost from '../hooks/useChatHistoricPost';
+
 const ChatPage = () => {
   const theme = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Parametler
   const conversationId = route.params?.conversationId || null;
   const readOnly = route.params?.readOnly || false;
-  const newConversation = route.params?.newConversation || false; // YENİ
+  const newConversation = route.params?.newConversation || false;
 
-  // useChatBot
   const { messages, sendMessage, loading, setMessages } = useChatBot();
-  // Yukarıda setMessages yoksa, hook'unuza ekleyin. (initMessages benzeri)
+
+  // --- YENİ: Post hook'u
+  const { sendHistoricMail, loading: mailLoading, error: mailError } = useChatHistoricPost();
 
   const [inputText, setInputText] = useState('');
   const [dots, setDots] = useState('');
-  // readOnly ise prompt zaten olmayacak
   const [showPrompts, setShowPrompts] = useState(!readOnly);
 
-  // currentConversation
   const [currentConversation, setCurrentConversation] = useState({
     id: null,
     title: '',
@@ -44,38 +46,20 @@ const ChatPage = () => {
     messages: [],
   });
 
-  // Prompts (Aynen koruyoruz)
+  // Eklenen: email state (sadece readOnly modunda gözükecek)
+  const [email, setEmail] = useState('');
+
   const prompts = [
-    { 
-      title: "Sıfır Atık Nedir?", 
-      description: "Atık üretimini en aza indirerek çevreyi koruyun." 
-    },
-    { 
-      title: "Geri Dönüşüm", 
-      description: "Kullanılan malzemeleri yeniden değerlendirin." 
-    },
-    { 
-      title: "Sürdürülebilir Yaşam", 
-      description: "Doğayla uyumlu, uzun vadeli çözümler üretin." 
-    },
-    { 
-      title: "Atık Azaltma Yöntemleri", 
-      description: "Günlük hayatınızda atıkları nasıl azaltabilirsiniz?" 
-    },
-    { 
-      title: "Çevre Dostu Ürünler", 
-      description: "Doğal ve çevre dostu ürünler hakkında bilgi edinin." 
-    },
+    { title: "Sıfır Atık Nedir?", description: "Atık üretimini en aza indirerek çevreyi koruyun." },
+    { title: "Geri Dönüşüm", description: "Kullanılan malzemeleri yeniden değerlendirin." },
+    { title: "Sürdürülebilir Yaşam", description: "Doğayla uyumlu, uzun vadeli çözümler üretin." },
+    // ...
   ];
 
-  // Header
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TouchableOpacity
-          style={{ marginLeft: 16 }}
-          onPress={() => navigation.toggleDrawer()}
-        >
+        <TouchableOpacity style={{ marginLeft: 16 }} onPress={() => navigation.toggleDrawer()}>
           <Ionicons name="menu" size={24} color={theme.colors.headerText} />
         </TouchableOpacity>
       ),
@@ -90,7 +74,6 @@ const ChatPage = () => {
     });
   }, [navigation, theme]);
 
-  // Loading animasyonu
   useEffect(() => {
     if (loading) {
       const interval = setInterval(() => {
@@ -100,18 +83,14 @@ const ChatPage = () => {
     }
   }, [loading]);
 
-  // SAYFA AÇILINCA parametrelere göre davran
+  // Parametre kontrolü
   useEffect(() => {
     if (readOnly && conversationId) {
-      // Eski konuşma
       loadOldConversation(conversationId);
     } else if (newConversation) {
-      // YENİ SOHBET => eskiyi kaydetmek isterseniz kaydedebilirsiniz
-      // ama asıl önemlisi "messages" sıfırlayın:
-      setMessages([]); // useChatBot içindeki messages = []
+      setMessages([]);
       createNewConversation();
     }
-    // else => normal flow
   }, [conversationId, readOnly, newConversation]);
 
   const loadOldConversation = async (id) => {
@@ -140,10 +119,9 @@ const ChatPage = () => {
     setCurrentConversation(conv);
   };
 
-  // Mesaj her değiştiğinde kaydetmek isterseniz
+  // Mesaj değiştikçe kaydet
   useEffect(() => {
     if (!readOnly && currentConversation.id) {
-      // Kaydet
       saveConversation({ ...currentConversation, messages });
     }
   }, [messages]);
@@ -175,6 +153,21 @@ const ChatPage = () => {
     sendMessage(promptTitle);
     setInputText('');
     setShowPrompts(false);
+  };
+
+  // YENİ: Geçmişi gönder butonu tıklandığında
+  const handleSendHistory = async () => {
+    if (!email.trim()) {
+      Alert.alert("Uyarı", "Lütfen geçerli bir e-posta adresi giriniz.");
+      return;
+    }
+    // currentConversation.messages'i mail olarak gönder
+    await sendHistoricMail(email, currentConversation.messages);
+    if (!mailError) {
+      Alert.alert("Bilgi", "Konuşma geçmişi başarıyla gönderildi.");
+      setEmail('');
+    }
+   
   };
 
   const renderMessageItem = ({ item }) => {
@@ -217,10 +210,9 @@ const ChatPage = () => {
     );
   };
 
-  // readOnly => input yok
+  // readOnly => normal inputu gizliyoruz
   const hideInputArea = readOnly;
-
-  // Gösterilecek mesajlar => eğer readOnly ise currentConversation.messages, değilse useChatBot messages
+  // Eğer readOnly ise bu ekranda messages => currentConversation.messages
   const displayedMessages = readOnly
     ? currentConversation.messages
     : messages;
@@ -248,7 +240,7 @@ const ChatPage = () => {
         contentContainerStyle={{ paddingBottom: 20 }}
       />
 
-      {/* Prompt sadece yeni sohbette ve input boşsa */}
+      {/* readOnly DEĞİLSE promptları göster */}
       {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
         <Image
           source={robotAssistant}
@@ -256,7 +248,6 @@ const ChatPage = () => {
           pointerEvents="none"
         />
       )}
-
       {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
         <View style={styles.promptsContainer}>
           <FlatList
@@ -284,7 +275,48 @@ const ChatPage = () => {
         </View>
       )}
 
-      {!hideInputArea && (
+      {/* eğer readOnly ise normal input yok, onun yerine e-posta gönderme arayüzü */}
+      {readOnly ? (
+        <View style={styles.bottomContainer}>
+          <View
+            style={[
+              styles.inputWrapper,
+              {
+                backgroundColor: '#f0f0f0',
+                borderColor: theme.colors.inputBorder,
+                borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
+              },
+            ]}
+          >
+            <TextInput
+              style={[styles.textInput, { color: '#000' }]}
+              placeholder="E-posta adresiniz"
+              placeholderTextColor="#999"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              onPress={handleSendHistory}
+              style={[
+                styles.iconWrapper,
+                { backgroundColor: theme.colors.primary },
+              ]}
+              disabled={mailLoading}
+            >
+              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
+                {mailLoading ? 'Gönderiliyor...' : 'Gönder'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {mailError && (
+            <Text style={{ color: 'red', marginTop: 4, marginLeft: 16 }}>
+              {mailError}
+            </Text>
+          )}
+        </View>
+      ) : (
+        /* readOnly değilse normal input */
         <View style={styles.bottomContainer}>
           <View
             style={[
@@ -330,9 +362,6 @@ const ChatPage = () => {
 
 export default ChatPage;
 
-
-
-// Stiller
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -390,8 +419,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     height: 40,
-    textAlign: 'left',
-    textAlignVertical: 'center',
   },
   iconWrapper: {
     marginLeft: 8,
