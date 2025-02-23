@@ -49,23 +49,11 @@ const GptPage = () => {
         }}
       />
 
-      {/* Diğer menüler (Haberler, Blog, Etkinlikler, Ayarlar) ... */}
-      <Drawer.Screen
-        name="Haberler"
-        component={HomeScreen}
-        options={{
-          title: 'Haberler',
-          drawerIcon: ({ size }) => (
-            <Ionicons name="newspaper" size={size} color={theme.colors.text} />
-          ),
-        }}
-      />
-      {/* ... vs ... */}
+      {/* ... diğer menüler ... */}
     </Drawer.Navigator>
   );
 };
 
-// Custom Drawer İçeriği
 const CustomDrawerContent = (props) => {
   const theme = useTheme();
   const { navigation } = props;
@@ -83,10 +71,8 @@ const CustomDrawerContent = (props) => {
       const data = await AsyncStorage.getItem('conversations');
       if (data) {
         let list = JSON.parse(data);
-        
-        // Diziyi ters çevir: son eklenen konuşma en başta görünsün
+        // Son eklenen konuşma en başa gelsin
         list.reverse();
-        
         setConversations(list);
       } else {
         setConversations([]);
@@ -95,12 +81,16 @@ const CustomDrawerContent = (props) => {
       console.log('AsyncStorage read error:', error);
     }
   };
-  
 
   return (
     <DrawerContentScrollView
       {...props}
-      contentContainerStyle={{ flex: 1, justifyContent: 'space-between' }}
+      contentContainerStyle={{
+        // İçeriği aşağıdan başlatmak için:
+        flexGrow: 1,
+        justifyContent: 'flex-end',
+        paddingBottom: 20, // Biraz boşluk ekleyebiliriz
+      }}
     >
       <View>
         {/* Ana Sayfa */}
@@ -115,12 +105,11 @@ const CustomDrawerContent = (props) => {
 
         <View style={styles.divider} />
 
-        {/* YENİ SOHBET */}
+        {/* Yeni Sohbet */}
         <DrawerItem
           label="Yeni Sohbet"
           labelStyle={{ color: theme.colors.text }}
           onPress={() => {
-            // ChatPage'e parametre: newConversation: true
             navigation.navigate('ChatPage', { newConversation: true });
           }}
           icon={({ size }) => (
@@ -133,10 +122,9 @@ const CustomDrawerContent = (props) => {
           Sohbet Geçmişi
         </Text>
 
-        {/* Konuşma Geçmişi Listesi */}
         {conversations.length > 0 ? (
           conversations.map((conv) => {
-            // snippet => ilk user mesajının 15 karakteri
+            // snippet => ilk user mesajından 15 karakter
             const firstUserMsg = conv.messages?.find(m => m.sender === 'user');
             let snippet = 'Yeni Konuşma';
             if (firstUserMsg && firstUserMsg.text) {
@@ -150,7 +138,6 @@ const CustomDrawerContent = (props) => {
                 label={`${snippet} - ${conv.time}`}
                 labelStyle={{ color: theme.colors.text, fontSize: 14 }}
                 onPress={() => {
-                  // Eski konuşma => readOnly
                   navigation.navigate('ChatPage', {
                     conversationId: conv.id,
                     readOnly: true,
@@ -169,8 +156,7 @@ const CustomDrawerContent = (props) => {
         )}
       </View>
 
-      {/* En Alt Kısımda Ayarlar Menüsü vs */}
-      {/* ... */}
+      {/* Alt kısımda diğer menüler (Ayarlar vb.) koyabilirsiniz */}
     </DrawerContentScrollView>
   );
 };
