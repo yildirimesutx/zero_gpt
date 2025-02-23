@@ -12,12 +12,13 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme } from '../theme/ThemeProvider'; // Tema context'inizi import edin
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../theme/ThemeProvider';
 import { useNavigation } from '@react-navigation/native';
 
 const MainMenu = () => {
   const [menuVisible, setMenuVisible] = useState(false);
-  const theme = useTheme(); // Tema değerlerini alıyoruz
+  const theme = useTheme();
   const navigation = useNavigation();
 
   const handleMenuPress = () => {
@@ -83,29 +84,75 @@ const MainMenu = () => {
                 style={styles.menuItem}
                 onPress={() => navigation.navigate('AboutUsScreen')}
               >
-                <Text style={{ color: theme.colors.text }}>Hakkımızda</Text>
+                <Ionicons
+                  name="information-circle-outline"
+                  size={24}
+                  color={theme.colors.text}
+                  style={styles.menuIcon}
+                />
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>Hakkımızda</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => navigation.navigate('NewsScreen')}
               >
-                <Text style={{ color: theme.colors.text }}>Haberler</Text>
+                <Ionicons
+                  name="newspaper-outline"
+                  size={24}
+                  color={theme.colors.text}
+                  style={styles.menuIcon}
+                />
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>Haberler</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => navigation.navigate('BlogsScreen')}
               >
-                <Text style={{ color: theme.colors.text }}>Blog</Text>
+                <Ionicons
+                  name="book-outline"
+                  size={24}
+                  color={theme.colors.text}
+                  style={styles.menuIcon}
+                />
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>Blog</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => navigation.navigate('ProjectsScreen')}
               >
-                <Text style={{ color: theme.colors.text }}>Projeler</Text>
+                <Ionicons
+                  name="briefcase-outline"
+                  size={24}
+                  color={theme.colors.text}
+                  style={styles.menuIcon}
+                />
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>Projeler</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => navigation.navigate('SettingsScreen')}
+              >
+                <Ionicons
+                  name="settings-outline"
+                  size={24}
+                  color={theme.colors.text}
+                  style={styles.menuIcon}
+                />
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>Ayarlar</Text>
+              </TouchableOpacity>
+
               <TouchableOpacity style={styles.closeButton} onPress={closeMenu}>
-                <Text style={{ color: theme.colors.text }}>Kapat</Text>
+                <Ionicons
+                  name="close-outline"
+                  size={24}
+                  color={theme.colors.text}
+                  style={styles.menuIcon}
+                />
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>Kapat</Text>
               </TouchableOpacity>
             </View>
           </Modal>
@@ -123,14 +170,13 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    // Arka plan temadan alınacak, default burada '#fff' idi.
   },
   containerWrapper: {
     flex: 1,
   },
   headerAndWelcomeContainer: {
-    borderBottomLeftRadius: 30, // Alt köşelere radius
-    borderBottomRightRadius: 30, // Alt köşelere radius
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
     overflow: 'hidden',
     elevation: 2,
     shadowColor: '#000',
@@ -178,24 +224,33 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     height: '100%',
-    width: 200,
-    // backgroundColor burada sabit '#fff' idi, artık temadan alınıyor.
+    width: 250,
     paddingTop: 60,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
   },
   menuTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 20,
   },
   menuItem: {
-    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+  },
+  menuIcon: {
+    marginRight: 10,
+  },
+  menuText: {
+    fontSize: 18,
+    fontWeight: '500',
   },
   closeButton: {
-    marginTop: 20,
-    backgroundColor: '#16A349',
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    borderRadius: 5,
+    paddingVertical: 12,
+    marginTop: 20,
   },
 });
