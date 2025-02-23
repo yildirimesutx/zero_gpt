@@ -46,7 +46,26 @@ const ChatPage = () => {
 
   // Prompts (Aynen koruyoruz)
   const prompts = [
-    // ...
+    { 
+      title: "Sıfır Atık Nedir?", 
+      description: "Atık üretimini en aza indirerek çevreyi koruyun." 
+    },
+    { 
+      title: "Geri Dönüşüm", 
+      description: "Kullanılan malzemeleri yeniden değerlendirin." 
+    },
+    { 
+      title: "Sürdürülebilir Yaşam", 
+      description: "Doğayla uyumlu, uzun vadeli çözümler üretin." 
+    },
+    { 
+      title: "Atık Azaltma Yöntemleri", 
+      description: "Günlük hayatınızda atıkları nasıl azaltabilirsiniz?" 
+    },
+    { 
+      title: "Çevre Dostu Ürünler", 
+      description: "Doğal ve çevre dostu ürünler hakkında bilgi edinin." 
+    },
   ];
 
   // Header
