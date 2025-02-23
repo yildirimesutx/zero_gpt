@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -7,11 +7,12 @@ import {
 import { View, Text, StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 
 import { useTheme } from '../theme/ThemeProvider';
 import ChatPage from './ChatPage';
 import HomeScreen from './HomeScreen';
+import { useDrawerStatus } from '@react-navigation/drawer';
 
 const Drawer = createDrawerNavigator();
 
@@ -58,13 +59,27 @@ const CustomDrawerContent = (props) => {
   const theme = useTheme();
   const { navigation } = props;
   const [conversations, setConversations] = useState([]);
+  const drawerStatus = useDrawerStatus(); // 'open' veya 'closed'
 
   // Drawer açıldığında/liste yenilendiğinde
+  const route = useRoute();
+  const newConv = route.params ? route.params.newConversation : false;
+
   useFocusEffect(
     useCallback(() => {
-      loadConversations();
-    }, [])
+      if (newConv) {
+        setMessages([]);
+        createNewConversation();
+        navigation.setParams({ newConversation: false });
+      }
+    }, [newConv])
   );
+
+  useEffect(() => {
+    if (drawerStatus === 'open') {
+      loadConversations();
+    }
+  }, [drawerStatus]);
 
   const loadConversations = async () => {
     try {
@@ -109,8 +124,14 @@ const CustomDrawerContent = (props) => {
         <DrawerItem
           label="Yeni Sohbet"
           labelStyle={{ color: theme.colors.text }}
+          // onPress={() => {
+          //   navigation.navigate('ChatPage', { newConversation: true });
+          // }}
           onPress={() => {
-            navigation.navigate('ChatPage', { newConversation: true });
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'ChatPage', params: { newConversation: true } }],
+            });
           }}
           icon={({ size }) => (
             <Ionicons name="add-circle" size={size} color={theme.colors.text} />
