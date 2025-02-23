@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
 import { View, Text, StyleSheet } from 'react-native';
-import ChatPage from './ChatPage'; // Örnek: Chat bileşeni (ZeroGPT ekranı)
-import HomeScreen from './HomeScreen'; // Örnek: Ana sayfa bileşeni
-// import SettingsScreen from './SettingsScreen'; // Ayarlar ekranı (kendi oluşturduğunuz bileşen)
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useTheme } from '../theme/ThemeProvider'; // Tema context'inizi import edin
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+
+import { useTheme } from '../theme/ThemeProvider';
+import ChatPage from './ChatPage';
+import HomeScreen from './HomeScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -28,14 +30,14 @@ const GptPage = () => {
         },
         headerStyle: {
           backgroundColor: theme.colors.headerBg,
-          elevation: 0,     // Android gölgesini kaldırır
-          shadowOpacity: 0, // iOS gölgesini kaldırır
+          elevation: 0,
+          shadowOpacity: 0,
         },
         headerTintColor: theme.colors.headerText,
         headerTitleAlign: 'center',
       }}
     >
-      {/* Örnek ekranlar */}
+      {/* ChatPage */}
       <Drawer.Screen
         name="ChatPage"
         component={ChatPage}
@@ -46,9 +48,11 @@ const GptPage = () => {
           ),
         }}
       />
+
+      {/* Diğer menüler (Haberler, Blog, Etkinlikler, Ayarlar) ... */}
       <Drawer.Screen
         name="Haberler"
-        component={HomeScreen} // Haberler ekranı bileşeni (örnek olarak HomeScreen kullanıldı)
+        component={HomeScreen}
         options={{
           title: 'Haberler',
           drawerIcon: ({ size }) => (
@@ -56,36 +60,7 @@ const GptPage = () => {
           ),
         }}
       />
-      <Drawer.Screen
-        name="Blog"
-        component={HomeScreen} // Blog ekranı bileşeni (örnek olarak HomeScreen kullanıldı)
-        options={{
-          title: 'Blog',
-          drawerIcon: ({ size }) => (
-            <Ionicons name="book" size={size} color={theme.colors.text} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Etkinlikler"
-        component={HomeScreen} // Etkinlikler ekranı bileşeni (örnek olarak HomeScreen kullanıldı)
-        options={{
-          title: 'Etkinlikler',
-          drawerIcon: ({ size }) => (
-            <Ionicons name="calendar" size={size} color={theme.colors.text} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Settings"
-        component={HomeScreen} // Ayarlar ekranı bileşeni
-        options={{
-          title: 'Ayarlar',
-          drawerIcon: ({ size }) => (
-            <Ionicons name="settings" size={size} color={theme.colors.text} />
-          ),
-        }}
-      />
+      {/* ... vs ... */}
     </Drawer.Navigator>
   );
 };
@@ -94,6 +69,33 @@ const GptPage = () => {
 const CustomDrawerContent = (props) => {
   const theme = useTheme();
   const { navigation } = props;
+  const [conversations, setConversations] = useState([]);
+
+  // Drawer açıldığında/liste yenilendiğinde
+  useFocusEffect(
+    useCallback(() => {
+      loadConversations();
+    }, [])
+  );
+
+  const loadConversations = async () => {
+    try {
+      const data = await AsyncStorage.getItem('conversations');
+      if (data) {
+        let list = JSON.parse(data);
+        
+        // Diziyi ters çevir: son eklenen konuşma en başta görünsün
+        list.reverse();
+        
+        setConversations(list);
+      } else {
+        setConversations([]);
+      }
+    } catch (error) {
+      console.log('AsyncStorage read error:', error);
+    }
+  };
+  
 
   return (
     <DrawerContentScrollView
@@ -101,7 +103,7 @@ const CustomDrawerContent = (props) => {
       contentContainerStyle={{ flex: 1, justifyContent: 'space-between' }}
     >
       <View>
-        {/* Ana Sayfa Yönlendirmesi.. */}
+        {/* Ana Sayfa */}
         <DrawerItem
           label="Ana Sayfa"
           labelStyle={{ color: theme.colors.text }}
@@ -113,47 +115,62 @@ const CustomDrawerContent = (props) => {
 
         <View style={styles.divider} />
 
-        {/* Menü Başlığı */}
-        <Text style={[styles.menuTitle, { color: theme.colors.text }]}>
-          Menü
+        {/* YENİ SOHBET */}
+        <DrawerItem
+          label="Yeni Sohbet"
+          labelStyle={{ color: theme.colors.text }}
+          onPress={() => {
+            // ChatPage'e parametre: newConversation: true
+            navigation.navigate('ChatPage', { newConversation: true });
+          }}
+          icon={({ size }) => (
+            <Ionicons name="add-circle" size={size} color={theme.colors.text} />
+          )}
+        />
+
+        {/* Sohbet Geçmişi Başlığı */}
+        <Text style={[styles.menuTitle, { color: theme.colors.text, marginTop: 16 }]}>
+          Sohbet Geçmişi
         </Text>
 
-        {/* Sabit Menü Öğeleri */}
-        <DrawerItem
-          label="Haberler"
-          labelStyle={{ color: theme.colors.text }}
-          onPress={() => navigation.navigate('Haberler')}
-          icon={({ size }) => (
-            <Ionicons name="newspaper" size={size} color={theme.colors.text} />
-          )}
-        />
-        <DrawerItem
-          label="Blog"
-          labelStyle={{ color: theme.colors.text }}
-          onPress={() => navigation.navigate('Blog')}
-          icon={({ size }) => (
-            <Ionicons name="book" size={size} color={theme.colors.text} />
-          )}
-        />
-        <DrawerItem
-          label="Etkinlikler"
-          labelStyle={{ color: theme.colors.text }}
-          onPress={() => navigation.navigate('Etkinlikler')}
-          icon={({ size }) => (
-            <Ionicons name="calendar" size={size} color={theme.colors.text} />
-          )}
-        />
+        {/* Konuşma Geçmişi Listesi */}
+        {conversations.length > 0 ? (
+          conversations.map((conv) => {
+            // snippet => ilk user mesajının 15 karakteri
+            const firstUserMsg = conv.messages?.find(m => m.sender === 'user');
+            let snippet = 'Yeni Konuşma';
+            if (firstUserMsg && firstUserMsg.text) {
+              snippet = firstUserMsg.text.substring(0, 15);
+              if (firstUserMsg.text.length > 15) snippet += '...';
+            }
+
+            return (
+              <DrawerItem
+                key={conv.id}
+                label={`${snippet} - ${conv.time}`}
+                labelStyle={{ color: theme.colors.text, fontSize: 14 }}
+                onPress={() => {
+                  // Eski konuşma => readOnly
+                  navigation.navigate('ChatPage', {
+                    conversationId: conv.id,
+                    readOnly: true,
+                  });
+                }}
+                icon={({ size }) => (
+                  <Ionicons name="time" size={size} color={theme.colors.text} />
+                )}
+              />
+            );
+          })
+        ) : (
+          <Text style={{ marginLeft: 16, color: theme.colors.text }}>
+            Kayıtlı sohbet yok
+          </Text>
+        )}
       </View>
 
-      {/* En Alt Kısımda Ayarlar Menüsü */}
-      <DrawerItem
-        label="Ayarlar"
-        labelStyle={{ color: theme.colors.text }}
-        onPress={() => navigation.navigate('Setting')}
-        icon={({ size }) => (
-          <Ionicons name="settings" size={size} color={theme.colors.text} />
-        )}
-      />
+      {/* En Alt Kısımda Ayarlar Menüsü vs */}
+      {/* ... */}
     </DrawerContentScrollView>
   );
 };

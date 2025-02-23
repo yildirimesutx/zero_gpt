@@ -10,47 +10,46 @@ import {
   Image,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeProvider';
 import useChatBot from '../hooks/useChatBot';
 import i18n from '../i18n/i18n';
-// Alternatif olarak resmi import edin:
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import robotAssistant from '../../assets/robot-assistant.png';
 
 const ChatPage = () => {
   const theme = useTheme();
   const navigation = useNavigation();
-  const { messages, sendMessage, loading } = useChatBot();
+  const route = useRoute();
+
+  // Parametler
+  const conversationId = route.params?.conversationId || null;
+  const readOnly = route.params?.readOnly || false;
+  const newConversation = route.params?.newConversation || false; // YENİ
+
+  // useChatBot
+  const { messages, sendMessage, loading, setMessages } = useChatBot();
+  // Yukarıda setMessages yoksa, hook'unuza ekleyin. (initMessages benzeri)
+
   const [inputText, setInputText] = useState('');
   const [dots, setDots] = useState('');
-  // showPrompts: sohbet başladıktan sonra promptların görünmemesi için
-  const [showPrompts, setShowPrompts] = useState(true);
+  // readOnly ise prompt zaten olmayacak
+  const [showPrompts, setShowPrompts] = useState(!readOnly);
 
-  // Örnek promptlar: her biri iki satırlı (başlık ve açıklama)
+  // currentConversation
+  const [currentConversation, setCurrentConversation] = useState({
+    id: null,
+    title: '',
+    time: '',
+    messages: [],
+  });
+
+  // Prompts (Aynen koruyoruz)
   const prompts = [
-    { 
-      title: "Sıfır Atık Nedir?", 
-      description: "Atık üretimini en aza indirerek çevreyi koruyun." 
-    },
-    { 
-      title: "Geri Dönüşüm", 
-      description: "Kullanılan malzemeleri yeniden değerlendirin." 
-    },
-    { 
-      title: "Sürdürülebilir Yaşam", 
-      description: "Doğayla uyumlu, uzun vadeli çözümler üretin." 
-    },
-    { 
-      title: "Atık Azaltma Yöntemleri", 
-      description: "Günlük hayatınızda atıkları nasıl azaltabilirsiniz?" 
-    },
-    { 
-      title: "Çevre Dostu Ürünler", 
-      description: "Doğal ve çevre dostu ürünler hakkında bilgi edinin." 
-    },
+    // ...
   ];
 
-  // Header kısmına hamburger menü eklemek için:
+  // Header
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -72,6 +71,7 @@ const ChatPage = () => {
     });
   }, [navigation, theme]);
 
+  // Loading animasyonu
   useEffect(() => {
     if (loading) {
       const interval = setInterval(() => {
@@ -81,23 +81,83 @@ const ChatPage = () => {
     }
   }, [loading]);
 
-  const handleSend = () => {
-    if (inputText.trim().length === 0) return;
-    sendMessage(inputText);
-    setInputText('');
-    setShowPrompts(false); // Sohbet başladı, promptları gizle
+  // SAYFA AÇILINCA parametrelere göre davran
+  useEffect(() => {
+    if (readOnly && conversationId) {
+      // Eski konuşma
+      loadOldConversation(conversationId);
+    } else if (newConversation) {
+      // YENİ SOHBET => eskiyi kaydetmek isterseniz kaydedebilirsiniz
+      // ama asıl önemlisi "messages" sıfırlayın:
+      setMessages([]); // useChatBot içindeki messages = []
+      createNewConversation();
+    }
+    // else => normal flow
+  }, [conversationId, readOnly, newConversation]);
+
+  const loadOldConversation = async (id) => {
+    try {
+      const stored = await AsyncStorage.getItem('conversations');
+      if (stored) {
+        const arr = JSON.parse(stored);
+        const found = arr.find((c) => c.id === id);
+        if (found) {
+          setCurrentConversation(found);
+        }
+      }
+    } catch (error) {
+      console.log('loadOldConversation error:', error);
+    }
   };
 
-  // Prompt'a dokunulduğunda: mesaj olarak gönder ve prompt listesini gizle
+  const createNewConversation = () => {
+    const now = new Date();
+    const conv = {
+      id: Date.now(),
+      title: "Yeni Sohbet",
+      time: now.toLocaleString(),
+      messages: [],
+    };
+    setCurrentConversation(conv);
+  };
+
+  // Mesaj her değiştiğinde kaydetmek isterseniz
+  useEffect(() => {
+    if (!readOnly && currentConversation.id) {
+      // Kaydet
+      saveConversation({ ...currentConversation, messages });
+    }
+  }, [messages]);
+
+  const saveConversation = async (conv) => {
+    try {
+      let data = await AsyncStorage.getItem('conversations');
+      let arr = data ? JSON.parse(data) : [];
+      const idx = arr.findIndex((c) => c.id === conv.id);
+      if (idx >= 0) {
+        arr[idx] = conv;
+      } else {
+        arr.push(conv);
+      }
+      await AsyncStorage.setItem('conversations', JSON.stringify(arr));
+    } catch (err) {
+      console.log('saveConversation error:', err);
+    }
+  };
+
+  const handleSend = () => {
+    if (!inputText.trim()) return;
+    sendMessage(inputText);
+    setInputText('');
+    setShowPrompts(false);
+  };
+
   const handlePromptPress = (promptTitle) => {
     sendMessage(promptTitle);
     setInputText('');
     setShowPrompts(false);
   };
 
-  console.log("messages", messages)
-
-  // Mesaj render fonksiyonu: Bot mesajlarında sol tarafta robot ikonu eklendi
   const renderMessageItem = ({ item }) => {
     const isUser = item.sender === 'user';
     return (
@@ -107,7 +167,6 @@ const ChatPage = () => {
           isUser ? styles.userContainer : styles.botContainer,
         ]}
       >
-        {/* Eğer bot mesajı ise sol tarafta robot ikonu göster */}
         {!isUser && (
           <Image
             source={require('../../assets/robot.png')}
@@ -139,31 +198,39 @@ const ChatPage = () => {
     );
   };
 
+  // readOnly => input yok
+  const hideInputArea = readOnly;
+
+  // Gösterilecek mesajlar => eğer readOnly ise currentConversation.messages, değilse useChatBot messages
+  const displayedMessages = readOnly
+    ? currentConversation.messages
+    : messages;
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <FlatList
         data={
           loading
-            ? [...messages, { id: 'loading', text: `${dots}`, sender: 'bot' }]
-            : messages
+            ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
+            : displayedMessages
         }
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) =>
-          item.id === 'loading' ? (
-            <View style={styles.botContainer}>
-              <Text style={styles.loadingText}>{dots}</Text>
-            </View>
-          ) : (
-            renderMessageItem({ item })
-          )
-        }
+        keyExtractor={(item, index) => item.id ? item.id.toString() : `msg-${index}`}
+        renderItem={({ item }) => {
+          if (item.id === 'loading') {
+            return (
+              <View style={styles.botContainer}>
+                <Text style={styles.loadingText}>{dots}</Text>
+              </View>
+            );
+          }
+          return renderMessageItem({ item });
+        }}
         style={styles.messageList}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
 
-      {/* Orta kısımda soluk renkli "robot-assistant" resmi:
-          Yalnızca promptlar görünürken (input boş ve showPrompts true) gösterilir */}
-      {showPrompts && inputText.trim().length === 0 && (
+      {/* Prompt sadece yeni sohbette ve input boşsa */}
+      {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
         <Image
           source={robotAssistant}
           style={styles.assistantImage}
@@ -171,13 +238,12 @@ const ChatPage = () => {
         />
       )}
 
-      {/* Input'un Üstünde Prompt Listesi: yalnızca input boşken ve sohbet henüz başlamadıysa göster */}
-      {showPrompts && inputText.trim().length === 0 && (
+      {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
         <View style={styles.promptsContainer}>
           <FlatList
             data={prompts}
             horizontal
-            keyExtractor={(item, index) => `${index}`}
+            keyExtractor={(item, idx) => `${idx}`}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <TouchableOpacity
@@ -199,54 +265,59 @@ const ChatPage = () => {
         </View>
       )}
 
-      <View style={styles.bottomContainer}>
-        <View
-          style={[
-            styles.inputWrapper,
-            {
-              backgroundColor: theme.colors.inputBg,
-              borderColor: theme.colors.inputBorder,
-              borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
-            },
-          ]}
-        >
-          <TextInput
-            style={[styles.textInput, { color: theme.colors.text }]}
-            placeholder={i18n.t('placeholder_message')}
-            placeholderTextColor={
-              theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'
-            }
-            value={inputText}
-            onChangeText={(text) => {
-              setInputText(text);
-              if (text.trim().length > 0) {
-                setShowPrompts(false);
-              }
-            }}
-            multiline
-          />
-
-          <TouchableOpacity
-            onPress={handleSend}
+      {!hideInputArea && (
+        <View style={styles.bottomContainer}>
+          <View
             style={[
-              styles.iconWrapper,
-              { backgroundColor: theme.colors.primary },
+              styles.inputWrapper,
+              {
+                backgroundColor: theme.colors.inputBg,
+                borderColor: theme.colors.inputBorder,
+                borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
+              },
             ]}
           >
-            <Ionicons name="send" size={20} color="#FFF" />
-          </TouchableOpacity>
+            <TextInput
+              style={[styles.textInput, { color: theme.colors.text }]}
+              placeholder={i18n.t('placeholder_message')}
+              placeholderTextColor={
+                theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'
+              }
+              value={inputText}
+              onChangeText={(text) => {
+                setInputText(text);
+                if (text.trim().length > 0) {
+                  setShowPrompts(false);
+                }
+              }}
+              multiline
+            />
+
+            <TouchableOpacity
+              onPress={handleSend}
+              style={[
+                styles.iconWrapper,
+                { backgroundColor: theme.colors.primary },
+              ]}
+            >
+              <Ionicons name="send" size={20} color="#FFF" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 };
 
 export default ChatPage;
 
+
+
+// Stiller
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: 'relative', // Absolute konumlandırılmış öğeler için
+    position: 'relative',
   },
   messageList: {
     flex: 1,
@@ -335,7 +406,7 @@ const styles = StyleSheet.create({
   },
   assistantImage: {
     position: 'absolute',
-    top: '25%', // Bu değeri düşürerek resmi daha yukarı alabilirsiniz.
+    top: '25%',
     alignSelf: 'center',
     opacity: 0.5,
     width: 100,

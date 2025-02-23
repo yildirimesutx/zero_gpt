@@ -62,7 +62,7 @@ const useChatBot = () => {
     }
   };
 
-  return { messages, sendMessage, loading };
+  return { messages, sendMessage, loading, setMessages };
 };
 
 export default useChatBot;
