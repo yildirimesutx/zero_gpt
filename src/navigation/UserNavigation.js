@@ -10,6 +10,7 @@ import NewsDetailScreen from '../screens/NewsDetailScreen';
 import BlogsDetailScreen from '../screens/BlogsDetailScreen';
 import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 import AboutUsScreen from '../screens/AboutUsScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createStackNavigator();
 
@@ -70,6 +71,13 @@ const UserNavigation = () => {
         component={AboutUsScreen}
         options={{ headerShown: false }}
       /> 
+
+      <Stack.Screen
+        name="SettingsScreen"
+        component={SettingsScreen}
+        options={{ headerShown: false }}
+      /> 
+
 
 
 

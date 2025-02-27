@@ -93,7 +93,7 @@ const MainMenu = () => {
                 <Text style={[styles.menuText, { color: theme.colors.text }]}>Hakkımızda</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => navigation.navigate('NewsScreen')}
               >
@@ -104,9 +104,9 @@ const MainMenu = () => {
                   style={styles.menuIcon}
                 />
                 <Text style={[styles.menuText, { color: theme.colors.text }]}>Haberler</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => navigation.navigate('BlogsScreen')}
               >
@@ -117,9 +117,9 @@ const MainMenu = () => {
                   style={styles.menuIcon}
                 />
                 <Text style={[styles.menuText, { color: theme.colors.text }]}>Blog</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => navigation.navigate('ProjectsScreen')}
               >
@@ -130,7 +130,7 @@ const MainMenu = () => {
                   style={styles.menuIcon}
                 />
                 <Text style={[styles.menuText, { color: theme.colors.text }]}>Projeler</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               <TouchableOpacity
                 style={styles.menuItem}
