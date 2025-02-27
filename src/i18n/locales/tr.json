@@ -14,7 +14,18 @@
       "about_page_content-4" :"Bu doğrultuda, eğitim, araştırma, proje geliştirme ve uygulama gibi alanlarda kapsamlı çalışmalar yürütülmektedir.Sıfır atık uygulamalarının her alanda hayata geçirilmesini sağlamak için kamu kurumları, özel sektör ve sivil toplum kuruluşlarıyla işbirliği içinde çalışmalar sürdürülmekte, ayrıca uluslararası düzeyde sıfır atık projeleri tanıtılarak dünya çapında bir etki yaratılması amaçlanmaktadır.",
     
     
-    "about_us": "Hakkımızda"
+    "about_us": "Hakkımızda",
+    "partners": {
+        "title": "Partnerler",
+        "unName": "Birleşmiş Milletler",
+        "unDescription": "(United Nations - UN)",
+        "unHabitatName": "Birleşmiş Milletler İnsan Yerleşimleri Programı",
+        "unHabitatDescription": "United Nations - UN",
+        "unEnvironmentName": "Birleşmiş Milletler Çevre Programı",
+        "unEnvironmentDescription": "United Nations Environment Programme - UNEP",
+        "turkishCouncilName": "Türk Devletleri Teşkilatı",
+        "turkishCouncilDescription": "Türk Devletleri Teşkilatı"
+      }
 
   }
   

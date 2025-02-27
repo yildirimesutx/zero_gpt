@@ -13,7 +13,19 @@
     
     "about_page_content-3":  "Among the foundation's core objectives are increasing awareness of zero waste, encouraging the sharing of knowledge and experience, and developing and disseminating practices in this field.",
     
-    "about_page_content-4":  "In pursuit of these goals, comprehensive efforts are underway in education, research, project development, and implementation. Collaborative initiatives with public institutions, the private sector, and non-governmental organizations are continuously carried out to implement zero waste practices across all areas, while zero waste projects are promoted internationally to create a global impact."
+    "about_page_content-4":  "In pursuit of these goals, comprehensive efforts are underway in education, research, project development, and implementation. Collaborative initiatives with public institutions, the private sector, and non-governmental organizations are continuously carried out to implement zero waste practices across all areas, while zero waste projects are promoted internationally to create a global impact.",
+
+    "partners": {
+        "title": "Partners",
+        "unName": "United Nations",
+        "unDescription": "(United Nations - UN)",
+        "unHabitatName": "United Nations Human Settlements Programme",
+        "unHabitatDescription": "United Nations - UN",
+        "unEnvironmentName": "United Nations Environment Programme",
+        "unEnvironmentDescription": "United Nations Environment Programme - UNEP",
+        "turkishCouncilName": "Organization of Turkish States",
+        "turkishCouncilDescription": "Organization of Turkish States"
+      }
    
 
   }

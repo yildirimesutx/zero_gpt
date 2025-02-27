@@ -11,6 +11,7 @@ import BlogPosts from '../components/Blogs';
 import Events from '../components/Events';
 import AIAssistantSection from '../components/AIAssistantSection';
 import News from '../components/News';
+import PartnerSection from './PartnerSection';
 
 const HomeScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -27,10 +28,16 @@ const HomeScreen = ({ navigation }) => {
           <AIAssistantSection navigation={navigation} />
         </View>
 
-        {/* Blog Yazıları */}
+        
+
         <View style={styles.section}>
+          <PartnerSection />
+          </View>
+
+        {/* Blog Yazıları */}
+        {/* <View style={styles.section}>
           <BlogPosts />
-        </View>
+        </View> */}
 
         {/* Bilgi Bölümü */}
         <View style={styles.section}>console.log('HomeScreen component rendered');
@@ -38,19 +45,19 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
             {/* Projeler */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <News />
-        </View>
+        </View> */}
 
           {/* Projeler */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Projects />
-        </View>
+        </View> */}
 
         {/* Etkinlikler */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Events />
-        </View>
+        </View> */}
 
         {/* Değerler Grid */}
         <View style={styles.section}>
