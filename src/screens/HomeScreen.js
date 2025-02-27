@@ -12,6 +12,7 @@ import Events from '../components/Events';
 import AIAssistantSection from '../components/AIAssistantSection';
 import News from '../components/News';
 import PartnerSection from './PartnerSection';
+import SponsorSection from './SponsorSection';
 
 const HomeScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -28,7 +29,10 @@ const HomeScreen = ({ navigation }) => {
           <AIAssistantSection navigation={navigation} />
         </View>
 
-        
+        {/* Bilgi Bölümü */}
+        <View style={styles.section}>console.log('HomeScreen component rendered');
+          <InfoSection />
+        </View>
 
         <View style={styles.section}>
           <PartnerSection />
@@ -39,10 +43,7 @@ const HomeScreen = ({ navigation }) => {
           <BlogPosts />
         </View> */}
 
-        {/* Bilgi Bölümü */}
-        <View style={styles.section}>console.log('HomeScreen component rendered');
-          <InfoSection />
-        </View>
+        
 
             {/* Projeler */}
         {/* <View style={styles.section}>
@@ -64,16 +65,20 @@ const HomeScreen = ({ navigation }) => {
           <ValuesGrid />
         </View>
 
+        <View style={styles.section}>
+          <SponsorSection />
+        </View>
+
       
       </ScrollView>
 
       {/* Sohbet Düğmesi */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.iconButton}
         onPress={() => navigation.navigate('GptPage')}
       >
         <Image source={require('../../assets/robot.png')} style={styles.image} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
