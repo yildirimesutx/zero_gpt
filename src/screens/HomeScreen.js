@@ -1,8 +1,10 @@
+// src/screens/HomeScreen.js
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../theme/ThemeProvider';
+
 import MainMenu from '../components/MainMenu';
 import InfoSection from '../components/InfoSection';
 import ValuesGrid from '../components/ValuesGrid';
@@ -17,9 +19,13 @@ import SponsorSection from './SponsorSection';
 const HomeScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const theme = useTheme();
+  
+  // Dark modda arka planı koyu gri, light modda #f9f9f9 olarak ayarlayacağız.
+  const isDark = theme.colors.background === '#000000';
+  const containerBg = isDark ? '#121212' : '#f9f9f9';
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.container, { backgroundColor: containerBg }]}>
       <ScrollView style={styles.scrollContent} nestedScrollEnabled={true}>
         {/* Menü */}
         <MainMenu />
@@ -30,35 +36,13 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Bilgi Bölümü */}
-        <View style={styles.section}>console.log('HomeScreen component rendered');
+        <View style={styles.section}>
           <InfoSection />
         </View>
 
         <View style={styles.section}>
           <PartnerSection />
-          </View>
-
-        {/* Blog Yazıları */}
-        {/* <View style={styles.section}>
-          <BlogPosts />
-        </View> */}
-
-        
-
-            {/* Projeler */}
-        {/* <View style={styles.section}>
-          <News />
-        </View> */}
-
-          {/* Projeler */}
-        {/* <View style={styles.section}>
-          <Projects />
-        </View> */}
-
-        {/* Etkinlikler */}
-        {/* <View style={styles.section}>
-          <Events />
-        </View> */}
+        </View>
 
         {/* Değerler Grid */}
         <View style={styles.section}>
@@ -68,11 +52,9 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.section}>
           <SponsorSection />
         </View>
-
-      
       </ScrollView>
 
-      {/* Sohbet Düğmesi */}
+      {/* Sohbet Düğmesi (Örnek) */}
       {/* <TouchableOpacity
         style={styles.iconButton}
         onPress={() => navigation.navigate('GptPage')}
@@ -89,9 +71,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  // scrollContent’ın da koyu gri olması isteniyorsa, containerBg aynen burada da kullanılabilir.
   scrollContent: {
     paddingBottom: 20,
-    backgroundColor: '#f9f9f9',
   },
   section: {
     marginBottom: 20,

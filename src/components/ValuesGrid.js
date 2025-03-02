@@ -1,5 +1,10 @@
+// src/screens/ValuesGrid.js
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
+import { useTheme } from '../theme/ThemeProvider';
+import i18n from '../i18n/i18n';
+
+const { width } = Dimensions.get('window');
 
 const data = [
   { title: 'Duyarlılık', description: 'Çevreye ve doğal kaynaklara karşı empati ve duyarlılıkla yaklaşıyoruz.', color: '#E3F2FD' }, // Pastel Mavi
@@ -9,21 +14,30 @@ const data = [
 ];
 
 const ValuesGrid = () => {
-  const numColumns = 2; // İki sütunlu grid
+  const theme = useTheme();
+  // Light modda, data içinde verilen renkler kullanılacak.
+  // Dark mod için ayrı renklendirme yapmak istiyorsanız darkColors dizisini kullanabilirsiniz.
+  // Örneğin:
+  const isDark = theme.colors.background === '#000000';
+  const darkColors = ['#2b6cb0', '#2f855a', '#b7791f', '#9f7aea'];
 
-  const renderItem = ({ item }) => (
-    <View style={[styles.card, { backgroundColor: item.color }]}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.description}>{item.description}</Text>
-    </View>
-  );
+  const renderItem = ({ item, index }) => {
+    const backgroundColor = isDark ? darkColors[index] : item.color;
+    const textColor = isDark ? '#fff' : (index === 0 ? '#333' : '#555'); // İstediğiniz şekilde ayarlayabilirsiniz.
+    return (
+      <View style={[styles.card, { backgroundColor }]}>
+        <Text style={[styles.title, { color: textColor }]}>{item.title}</Text>
+        <Text style={[styles.description, { color: textColor }]}>{item.description}</Text>
+      </View>
+    );
+  };
 
   return (
     <FlatList
       data={data}
       renderItem={renderItem}
       keyExtractor={(item, index) => index.toString()}
-      numColumns={numColumns} // Grid yapısı için sütun sayısı
+      numColumns={2}
       contentContainerStyle={styles.container}
     />
   );
@@ -53,13 +67,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
     textAlign: 'center',
+    marginBottom: 5,
   },
   description: {
     fontSize: 14,
-    color: '#555',
     textAlign: 'center',
   },
 });
