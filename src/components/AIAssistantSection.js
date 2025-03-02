@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
+import i18n from '../i18n/i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -25,16 +26,16 @@ const AIAssistantSection = ({ navigation }) => {
         style={styles.image}
       />
       <Text style={[styles.heading, { color: isDark ? '#fff' : '#004d00' }]}>
-        Yapay Zeka ile Görüş
+        {i18n.t('ai_assistant_section.header')}
       </Text>
       <Text style={[styles.description, { color: isDark ? '#ccc' : '#666' }]}>
-        Merak ettiğiniz soruları sorun veya yapay zeka ile iletişime geçin. Anında yardım alın!
+      {i18n.t('ai_assistant_section.text')}
       </Text>
       <TouchableOpacity
         style={[styles.button, { backgroundColor: isDark ? '#11A624' : '#004d00' }]}
         onPress={() => navigation.navigate('GptPage')}
       >
-        <Text style={styles.buttonText}>Konuşmaya Başla</Text>
+        <Text style={styles.buttonText}> {i18n.t('ai_assistant_section.buton')}</Text>
       </TouchableOpacity>
     </View>
   );

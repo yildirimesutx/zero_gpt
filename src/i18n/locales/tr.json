@@ -25,7 +25,33 @@
         "unEnvironmentDescription": "United Nations Environment Programme - UNEP",
         "turkishCouncilName": "Türk Devletleri Teşkilatı",
         "turkishCouncilDescription": "Türk Devletleri Teşkilatı"
-      }
+      },
+      
+    "ai_assistant_section" :{
+      "header": "SıfırAtıkGPT ile Görüş",
+      "text" : "Merak ettiğiniz soruları sorun veya yapay zeka ile iletişime geçin. Anında yardım alın!",
+      "buton" : "Konuşmaya Başla"
+    },
+    "info_section" : {
+      "id_1" : "Proje Tamamlandı",
+      "id_2" : "Hayata Dokunuldu",
+      "id_3" : "Ortak Kuruluşlar",
+      "id_4" : "Gönüllüler"
+    },
+    "valuesGridDes" :{
+      "id1Des" : "Çevreye ve doğal kaynaklara karşı empati ve duyarlılıkla yaklaşıyoruz.",
+      "id2Des" : "En yüksek dürüstlük ve şeffaflık standartlarını koruyoruz.",
+      "id3Des" : "Sivil toplum kuruluşları ve bireylerle işbirliği içinde çalışıyoruz.",
+      "id4Des" : "Uzun vadeli bir gelecek inşa etmek için sürdürülebilir çözümler üretiyoruz."
+    },
+    "valuesGridName" :{
+      "id_1" : "Duyarlılık",
+      "id_2" : "Dürüstlük",
+      "id_3" : "İşbirliği",
+      "id_4" : "Sürdürülebilirlik"
+    }
+
+
 
   }
   

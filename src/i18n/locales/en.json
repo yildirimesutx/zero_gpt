@@ -25,7 +25,22 @@
         "unEnvironmentDescription": "United Nations Environment Programme - UNEP",
         "turkishCouncilName": "Organization of Turkish States",
         "turkishCouncilDescription": "Organization of Turkish States"
-      }
+      },
+
+    "ai_assistant_section": {
+        "header": "Talk to ZeroWasteGPT",
+        "text": "Ask your questions or interact with the AI for instant help!",
+        "buton": "Start Chat"
+        },
+
+    "info_section": {
+        "id_1": "Projects Completed",
+        "id_2": "Lives Impacted",
+        "id_3": "Partner Organizations",
+        "id_4": "Volunteers"
+        }
+
+
    
 
   }

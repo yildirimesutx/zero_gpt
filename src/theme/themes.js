@@ -32,7 +32,7 @@ export const DarkTheme = {
   colors: {
     background: '#000000',
     text: '#FFFFFF',
-    primary: '#BB86FC',
+    primary: '#11A624',
 
     // Kullanıcı baloncuk rengi
     userBubble: '#444444', // Koyu gri

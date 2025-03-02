@@ -114,7 +114,7 @@ const CustomDrawerContent = (props) => {
           labelStyle={{ color: theme.colors.text }}
           onPress={() => navigation.navigate('Home')}
           icon={({ size }) => (
-            <Ionicons name="home" size={size} color={theme.colors.text} />
+            <Ionicons name="home" size={size} color={theme.colors.primary} />
           )}
         />
 
@@ -134,7 +134,7 @@ const CustomDrawerContent = (props) => {
             });
           }}
           icon={({ size }) => (
-            <Ionicons name="add-circle" size={size} color={theme.colors.text} />
+            <Ionicons name="add-circle" size={size} color={theme.colors.primary} />
           )}
         />
 
@@ -165,7 +165,7 @@ const CustomDrawerContent = (props) => {
                   });
                 }}
                 icon={({ size }) => (
-                  <Ionicons name="time" size={size} color={theme.colors.text} />
+                  <Ionicons name="time" size={size} color={theme.colors.primary} />
                 )}
               />
             );

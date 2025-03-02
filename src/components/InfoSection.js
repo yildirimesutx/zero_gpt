@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
+import i18n from '../i18n/i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -11,10 +12,10 @@ const InfoSection = () => {
   const isDark = theme.colors.background === '#000000';
 
   const data = [
-    { value: '50+', label: 'Proje Tamamlandı', color: '#E3F2FD' }, // Pastel Mavi
-    { value: '20K+', label: 'Hayata Dokunuldu', color: '#E8F5E9' }, // Pastel Yeşil
-    { value: '30+', label: 'Ortak Kuruluşlar', color: '#FFFDE7' }, // Pastel Sarı
-    { value: '100+', label: 'Gönüllüler', color: '#FCE4EC' }, // Pastel Pembe
+    { value: '50+', label: i18n.t('info_section.id_1'), color: '#E3F2FD' }, // Pastel Mavi
+    { value: '20K+', label: i18n.t('info_section.id_2'), color: '#E8F5E9' }, // Pastel Yeşil
+    { value: '30+', label: i18n.t('info_section.id_3'), color: '#FFFDE7' }, // Pastel Sarı
+    { value: '100+', label: i18n.t('info_section.id_4'), color: '#FCE4EC' }, // Pastel Pembe
   ];
 
   // Dark mod için alternatif renkler (istediğiniz şekilde özelleştirebilirsiniz)
