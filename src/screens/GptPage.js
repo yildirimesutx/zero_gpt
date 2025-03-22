@@ -4,7 +4,7 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRoute } from '@react-navigation/native';
@@ -38,7 +38,6 @@ const GptPage = () => {
         headerTitleAlign: 'center',
       }}
     >
-      {/* ChatPage */}
       <Drawer.Screen
         name="ChatPage"
         component={ChatPage}
@@ -49,8 +48,6 @@ const GptPage = () => {
           ),
         }}
       />
-
-      {/* ... diğer menüler ... */}
     </Drawer.Navigator>
   );
 };
@@ -59,17 +56,13 @@ const CustomDrawerContent = (props) => {
   const theme = useTheme();
   const { navigation } = props;
   const [conversations, setConversations] = useState([]);
-  const drawerStatus = useDrawerStatus(); // 'open' veya 'closed'
-
-  // Drawer açıldığında/liste yenilendiğinde
+  const drawerStatus = useDrawerStatus();
   const route = useRoute();
   const newConv = route.params ? route.params.newConversation : false;
 
   useFocusEffect(
     useCallback(() => {
       if (newConv) {
-        setMessages([]);
-        createNewConversation();
         navigation.setParams({ newConversation: false });
       }
     }, [newConv])
@@ -86,14 +79,36 @@ const CustomDrawerContent = (props) => {
       const data = await AsyncStorage.getItem('conversations');
       if (data) {
         let list = JSON.parse(data);
-        // Son eklenen konuşma en başa gelsin
         list.reverse();
         setConversations(list);
       } else {
         setConversations([]);
       }
     } catch (error) {
-      console.log('AsyncStorage read error:', error);
+      console.log('AsyncStorage okuma hatası:', error);
+    }
+  };
+
+  const handleDeleteConversation = (conversationId) => {
+    Alert.alert(
+      "Sohbeti Sil",
+      "Bu sohbeti silmek istediğinize emin misiniz?",
+      [
+        { text: "İptal", style: "cancel" },
+        { text: "Sil", onPress: () => deleteConversation(conversationId) },
+      ]
+    );
+  };
+
+  const deleteConversation = async (conversationId) => {
+    try {
+      const updatedConversations = conversations.filter(
+        (conv) => conv.id !== conversationId
+      );
+      setConversations(updatedConversations);
+      await AsyncStorage.setItem('conversations', JSON.stringify(updatedConversations));
+    } catch (error) {
+      console.log('Sohbet silinirken hata oluştu:', error);
     }
   };
 
@@ -101,14 +116,13 @@ const CustomDrawerContent = (props) => {
     <DrawerContentScrollView
       {...props}
       contentContainerStyle={{
-        // İçeriği aşağıdan başlatmak için:
         flexGrow: 1,
-        justifyContent: 'flex-end',
-        paddingBottom: 20, // Biraz boşluk ekleyebiliriz
+        justifyContent: 'flex-start',
+        paddingBottom: 20,
       }}
     >
       <View>
-        {/* Ana Sayfa */}
+        {/* Sabit Üst Menü */}
         <DrawerItem
           label="Ana Sayfa"
           labelStyle={{ color: theme.colors.text }}
@@ -120,13 +134,9 @@ const CustomDrawerContent = (props) => {
 
         <View style={styles.divider} />
 
-        {/* Yeni Sohbet */}
         <DrawerItem
           label="Yeni Sohbet"
           labelStyle={{ color: theme.colors.text }}
-          // onPress={() => {
-          //   navigation.navigate('ChatPage', { newConversation: true });
-          // }}
           onPress={() => {
             navigation.reset({
               index: 0,
@@ -138,14 +148,13 @@ const CustomDrawerContent = (props) => {
           )}
         />
 
-        {/* Sohbet Geçmişi Başlığı */}
         <Text style={[styles.menuTitle, { color: theme.colors.text, marginTop: 16 }]}>
           Sohbet Geçmişi
         </Text>
 
+        {/* Sohbet Geçmişi Listesi */}
         {conversations.length > 0 ? (
           conversations.map((conv) => {
-            // snippet => ilk user mesajından 15 karakter
             const firstUserMsg = conv.messages?.find(m => m.sender === 'user');
             let snippet = 'Yeni Konuşma';
             if (firstUserMsg && firstUserMsg.text) {
@@ -154,20 +163,36 @@ const CustomDrawerContent = (props) => {
             }
 
             return (
-              <DrawerItem
-                key={conv.id}
-                label={`${snippet} - ${conv.time}`}
-                labelStyle={{ color: theme.colors.text, fontSize: 14 }}
+              <View key={conv.id} style={styles.conversationRow}>
+              <TouchableOpacity
                 onPress={() => {
                   navigation.navigate('ChatPage', {
                     conversationId: conv.id,
                     readOnly: true,
                   });
                 }}
-                icon={({ size }) => (
-                  <Ionicons name="time" size={size} color={theme.colors.primary} />
-                )}
-              />
+                style={styles.conversationContent}
+              >
+                <Ionicons
+                  name="time"
+                  size={20}
+                  color={theme.colors.primary}
+                  style={{ marginRight: 8 }}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: theme.colors.text, fontSize: 14 }}>
+                    {`${snippet} - ${conv.time}`}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleDeleteConversation(conv.id)}
+                style={styles.deleteIcon}
+              >
+                <Ionicons name="trash" size={20} color={theme.colors.primary} />
+              </TouchableOpacity>
+            </View>
+
             );
           })
         ) : (
@@ -176,8 +201,6 @@ const CustomDrawerContent = (props) => {
           </Text>
         )}
       </View>
-
-      {/* Alt kısımda diğer menüler (Ayarlar vb.) koyabilirsiniz */}
     </DrawerContentScrollView>
   );
 };
@@ -195,5 +218,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 16,
     marginVertical: 10,
+  },
+  conversationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    justifyContent: 'space-between',
+  },
+  conversationContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  deleteIcon: {
+    padding: 8,
   },
 });

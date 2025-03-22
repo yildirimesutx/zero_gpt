@@ -4,6 +4,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
   StyleSheet,
   FlatList,
   Platform,
@@ -218,6 +219,11 @@ const ChatPage = () => {
     : messages;
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0} // Üst kısımdaki header yüksekliğine göre ayarlayın
+    >
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <FlatList
         data={
@@ -357,6 +363,7 @@ const ChatPage = () => {
         </View>
       )}
     </View>
+    </KeyboardAvoidingView>
   );
 };
 

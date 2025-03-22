@@ -40,9 +40,9 @@ const HomeScreen = ({ navigation }) => {
           <InfoSection />
         </View>
 
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <PartnerSection />
-        </View>
+        </View> */}
 
         {/* Değerler Grid */}
         <View style={styles.section}>

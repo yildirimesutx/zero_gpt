@@ -52,7 +52,7 @@ const MainMenu = () => {
           >
             <View style={styles.headerContainer}>
               <Image
-                source={require('../../assets/logo.png')}
+                source={require('../../assets/logo_new2.png')}
                 style={styles.logo}
               />
               <TouchableOpacity onPress={handleMenuPress}>
@@ -166,7 +166,7 @@ export default MainMenu;
 
 const styles = StyleSheet.create({
   statusBarBackground: {
-    height: Platform.OS === 'ios' ? 60 : StatusBar.currentHeight,
+    height: Platform.OS === 'ios' ? 65 : StatusBar.currentHeight,
   },
   safeArea: {
     flex: 1,
@@ -192,9 +192,9 @@ const styles = StyleSheet.create({
     height: 70,
   },
   logo: {
-    width: 90,
-    height: 45,
-    resizeMode: 'contain',
+    width: 180,
+    height: 120,
+ 
   },
   welcomeContainer: {
     justifyContent: 'center',
