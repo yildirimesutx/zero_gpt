@@ -6,12 +6,8 @@ import i18n from '../i18n/i18n';
 
 const { width } = Dimensions.get('window');
 
-const data = [
-  { title:  i18n.t('valuesGridName.id_1'), description: i18n.t('valuesGridDes.id1Des'), color: '#E3F2FD' }, // Pastel Mavi
-  { title: i18n.t('valuesGridName.id_2'), description: i18n.t('valuesGridDes.id2Des'), color: '#E8F5E9' }, // Pastel Yeşil
-  { title: i18n.t('valuesGridName.id_3'), description: i18n.t('valuesGridDes.id3Des'), color: '#FFFDE7' }, // Pastel Sarı
-  { title: i18n.t('valuesGridName.id_4'), description: i18n.t('valuesGridDes.id4Des'), color: '#FCE4EC' }, // Pastel Pembe
-];
+
+
 
 const ValuesGrid = () => {
   const theme = useTheme();
@@ -20,6 +16,15 @@ const ValuesGrid = () => {
   // Örneğin:
   const isDark = theme.colors.background === '#000000';
   const darkColors = ['#2b6cb0', '#2f855a', '#b7791f', '#9f7aea'];
+
+
+
+const data = [
+  { title:  i18n.t('values_grid_name.id_1'), description: i18n.t('values_grid_des.id1_des'), color: '#E3F2FD' }, // Pastel Mavi
+  { title: i18n.t('values_grid_name.id_2'), description: i18n.t('values_grid_des.id2_des'), color: '#E8F5E9' }, // Pastel Yeşil
+  { title: i18n.t('values_grid_name.id_3'), description: i18n.t('values_grid_des.id3_des'), color: '#FFFDE7' }, // Pastel Sarı
+  { title: i18n.t('values_grid_name.id_4'), description: i18n.t('values_grid_des.id4_des'), color: '#FCE4EC' }, // Pastel Pembe
+];
 
   const renderItem = ({ item, index }) => {
     const backgroundColor = isDark ? darkColors[index] : item.color;

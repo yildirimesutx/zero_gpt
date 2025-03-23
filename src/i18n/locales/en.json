@@ -39,13 +39,13 @@
         "id_3": "Partner Organizations",
         "id_4": "Volunteers"
         },
-    "valuesGridDes" : {
-        "id1Des" : "We approach the environment and natural resources with empathy and sensitivity.",
-        "id2Des" : "We uphold the highest standards of honesty and transparency.",
-        "id3Des" : "We work in collaboration with non-governmental organizations and individuals.",
-        "id4Des" : "We develop sustainable solutions to build a long-term future."
+    "values_grid_des" : {
+        "id1_des" : "We approach the environment and natural resources with empathy and sensitivity.",
+        "id2_des" : "We uphold the highest standards of honesty and transparency.",
+        "id3_des" : "We work in collaboration with non-governmental organizations and individuals.",
+        "id4_des" : "We develop sustainable solutions to build a long-term future."
         },
-        "valuesGridName" : {
+    "values_grid_name" : {
         "id_1" : "Sensitivity",
         "id_2" : "Integrity",
         "id_3" : "Collaboration",
@@ -56,7 +56,61 @@
         "subtitle": "Make a difference by joining Zero Waste. Our organization is dedicated to improving lives through various community projects and initiatives."
         },
 
-    "logoEn" : "true"    
+    "theme": {
+        "light": "Light",
+        "dark": "Dark",
+        "theme": "Theme"
+    },
+    "language": {
+        "english": "English",
+        "turkisch": "Turkish",
+        "language": "Language"
+    },
+    "home_page" : {
+      "home_page" : "Home Page"
+    },
+    "settings" : "Settings",
+    "close" : "Close",
+    "menu": "Menu",
+    "zero_gpt": "ZeroWasteGPT",
+  
+    "new_chat": "New Chat",
+    "chat_history": "Chat History",
+
+    "delete_conversation": {
+    "title": "Delete Conversation",
+    "message": "Are you sure you want to delete this conversation?",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+
+  "prompts": [
+    {
+      "title": "What is Zero Waste?",
+      "description": "Protect the environment by minimizing waste production."
+    },
+    {
+      "title": "Recycling",
+      "description": "Reuse materials by recycling them."
+    },
+    {
+      "title": "Sustainable Living",
+      "description": "Develop long-term solutions that are in harmony with nature."
+    }
+  ],
+
+  "deep_search": "Deep Search",
+  "send_history": {
+    "warning_title": "Warning",
+    "invalid_email": "Please enter a valid email address.",
+    "info_title": "Info",
+    "history_sent": "Chat history sent successfully.",
+    "sending": "Sending...",
+    "send": "Send",
+    "email_placeholder": "Your email address"
+  }
+   
+
 
     
 

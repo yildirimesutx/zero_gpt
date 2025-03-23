@@ -13,6 +13,7 @@ import { useTheme } from '../theme/ThemeProvider';
 import ChatPage from './ChatPage';
 import HomeScreen from './HomeScreen';
 import { useDrawerStatus } from '@react-navigation/drawer';
+import i18n from '../i18n/i18n';
 
 const Drawer = createDrawerNavigator();
 
@@ -91,11 +92,11 @@ const CustomDrawerContent = (props) => {
 
   const handleDeleteConversation = (conversationId) => {
     Alert.alert(
-      "Sohbeti Sil",
-      "Bu sohbeti silmek istediğinize emin misiniz?",
+      i18n.t('delete_conversation.title'),
+      i18n.t('delete_conversation.message'),
       [
-        { text: "İptal", style: "cancel" },
-        { text: "Sil", onPress: () => deleteConversation(conversationId) },
+        { text: i18n.t('delete_conversation.cancel'), style: 'cancel' },
+        { text: i18n.t('delete_conversation.confirm'), onPress: () => deleteConversation(conversationId) },
       ]
     );
   };
@@ -124,7 +125,7 @@ const CustomDrawerContent = (props) => {
       <View>
         {/* Sabit Üst Menü */}
         <DrawerItem
-          label="Ana Sayfa"
+          label= {i18n.t('home_page.home_page')}
           labelStyle={{ color: theme.colors.text }}
           onPress={() => navigation.navigate('Home')}
           icon={({ size }) => (
@@ -135,7 +136,7 @@ const CustomDrawerContent = (props) => {
         <View style={styles.divider} />
 
         <DrawerItem
-          label="Yeni Sohbet"
+          label={i18n.t('new_chat')}
           labelStyle={{ color: theme.colors.text }}
           onPress={() => {
             navigation.reset({
@@ -149,7 +150,7 @@ const CustomDrawerContent = (props) => {
         />
 
         <Text style={[styles.menuTitle, { color: theme.colors.text, marginTop: 16 }]}>
-          Sohbet Geçmişi
+        {i18n.t('chat_history')}
         </Text>
 
         {/* Sohbet Geçmişi Listesi */}

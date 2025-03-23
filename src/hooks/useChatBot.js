@@ -4,7 +4,7 @@ import {BASE_URL} from './baseURL';
 
 const API_URL = Constants.expoConfig.extra.aiApiUrl;
 const API_KEY = Constants.expoConfig.extra.aiApiKey;
-const DEEP_SEARCH_URL = Constants.expoConfig.extra.deepSearchUrl; // Derin arama endpoint URL'si
+
 
 const useChatBot = () => {
   const [messages, setMessages] = useState([]);

@@ -15,6 +15,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../theme/ThemeProvider';
 import { useNavigation } from '@react-navigation/native';
+import i18n from '../i18n/i18n';
 
 const MainMenu = () => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -28,6 +29,10 @@ const MainMenu = () => {
   const closeMenu = () => {
     setMenuVisible(false);
   };
+
+const lang = i18n.locale
+
+console.log("lang", lang)
 
   return (
     <>
@@ -51,10 +56,17 @@ const MainMenu = () => {
             style={styles.headerAndWelcomeContainer}
           >
             <View style={styles.headerContainer}>
-              <Image
-                source={require('../../assets/logo_new2.png')}
-                style={styles.logo}
-              />
+            {lang && lang.toLowerCase().startsWith("tr") ? 
+                <Image
+                  source={require('../../assets/logo_tr.png')}
+                  style={styles.logo}
+                /> :
+                <Image
+                  source={require('../../assets/logo_new2.png')}
+                  style={styles.logo}
+                />
+              }
+              
               <TouchableOpacity onPress={handleMenuPress}>
                 <MaterialIcons name="menu" size={30} color="#fff" />
               </TouchableOpacity>
@@ -62,12 +74,10 @@ const MainMenu = () => {
 
             <View style={styles.welcomeContainer}>
               <Text style={styles.welcomeText}>
-                Toplulukları Güçlendirerek, Hayatları Dönüştürüyoruz.!
+                {i18n.t('heroSection.title')}
               </Text>
               <Text style={styles.subText}>
-                Sıfır Atık'a katılarak fark yaratın. Kurumumuz, çeşitli
-                topluluk projeleri ve girişimleri aracılığıyla hayatları iyileştirmeye
-                kendini adamıştır.
+                {i18n.t('heroSection.subtitle')}
               </Text>
             </View>
           </LinearGradient>
@@ -90,7 +100,7 @@ const MainMenu = () => {
                   color={theme.colors.text}
                   style={styles.menuIcon}
                 />
-                <Text style={[styles.menuText, { color: theme.colors.text }]}>Hakkımızda</Text>
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>{i18n.t('about_us')}</Text>
               </TouchableOpacity>
 
               {/* <TouchableOpacity
@@ -142,7 +152,7 @@ const MainMenu = () => {
                   color={theme.colors.text}
                   style={styles.menuIcon}
                 />
-                <Text style={[styles.menuText, { color: theme.colors.text }]}>Ayarlar</Text>
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>{i18n.t('settings')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.closeButton} onPress={closeMenu}>
@@ -152,7 +162,7 @@ const MainMenu = () => {
                   color={theme.colors.text}
                   style={styles.menuIcon}
                 />
-                <Text style={[styles.menuText, { color: theme.colors.text }]}>Kapat</Text>
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>{i18n.t('close')}</Text>
               </TouchableOpacity>
             </View>
           </Modal>

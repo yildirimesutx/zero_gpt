@@ -38,13 +38,13 @@
       "id_3" : "Ortak Kuruluşlar",
       "id_4" : "Gönüllüler"
     },
-    "valuesGridDes" :{
-      "id1Des" : "Çevreye ve doğal kaynaklara karşı empati ve duyarlılıkla yaklaşıyoruz.",
-      "id2Des" : "En yüksek dürüstlük ve şeffaflık standartlarını koruyoruz.",
-      "id3Des" : "Sivil toplum kuruluşları ve bireylerle işbirliği içinde çalışıyoruz.",
-      "id4Des" : "Uzun vadeli bir gelecek inşa etmek için sürdürülebilir çözümler üretiyoruz."
+    "values_grid_des" :{
+      "id1_des" : "Çevreye ve doğal kaynaklara karşı empati ve duyarlılıkla yaklaşıyoruz.",
+      "id2_des" : "En yüksek dürüstlük ve şeffaflık standartlarını koruyoruz.",
+      "id3_des" : "Sivil toplum kuruluşları ve bireylerle işbirliği içinde çalışıyoruz.",
+      "id4_des" : "Uzun vadeli bir gelecek inşa etmek için sürdürülebilir çözümler üretiyoruz."
     },
-    "valuesGridName" :{
+    "values_grid_name" :{
       "id_1" : "Duyarlılık",
       "id_2" : "Dürüstlük",
       "id_3" : "İşbirliği",
@@ -54,7 +54,62 @@
     "heroSection": {
       "title": "Toplulukları Güçlendirerek, Hayatları Dönüştürüyoruz.!",
       "subtitle": "Sıfır Atık'a katılarak fark yaratın. Kurumumuz, çeşitli topluluk projeleri ve girişimleri aracılığıyla hayatları iyileştirmeye kendini adamıştır."
+    },
+
+    "theme": {
+      "light": "Aydınlık",
+      "dark": "Koyu",
+      "theme": "Tema"
+    },
+    "language": {
+      "english": "İngilizce",
+      "turkisch": "Türkçe",
+      "language": "Dil"
+    },
+
+    "home_page" : {
+      "home_page" : "Ana Sayfa"
+    },
+    "settings" : "Ayarlar",
+    "close" : "Kapat",
+    "menu": "Menü",
+    "zero_gpt": "SıfırAtıkGPT",
+    "new_chat": "Yeni Sohbet",
+    "chat_history": "Sohbet Geçmişi",
+
+    "delete_conversation": {
+      "title": "Sohbeti Sil",
+      "message": "Bu sohbeti silmek istediğinize emin misiniz?",
+      "cancel": "İptal",
+      "confirm": "Sil"
+    },
+    "prompts": [
+    {
+      "title": "Sıfır Atık Nedir?",
+      "description": "Atık üretimini en aza indirerek çevreyi koruyun."
+    },
+    {
+      "title": "Geri Dönüşüm",
+      "description": "Kullanılan malzemeleri yeniden değerlendirin."
+    },
+    {
+      "title": "Sürdürülebilir Yaşam",
+      "description": "Doğayla uyumlu, uzun vadeli çözümler üretin."
     }
+  ],
+
+  "deep_search": "Derin Arama",
+  "send_history": {
+    "warning_title": "Uyarı",
+    "invalid_email": "Lütfen geçerli bir e-posta adresi giriniz.",
+    "info_title": "Bilgi",
+    "history_sent": "Konuşma geçmişi başarıyla gönderildi.",
+    "sending": "Gönderiliyor...",
+    "send": "Gönder",
+    "email_placeholder": "E-posta adresiniz"
+  }
+
+
 
 
 
