@@ -107,7 +107,28 @@
     "sending": "Gönderiliyor...",
     "send": "Gönder",
     "email_placeholder": "E-posta adresiniz"
-  }
+  },
+  "contactForm": {
+    "title": "İletişime Geçin",
+    "name": "Ad*",
+    "email": "E-posta*",
+    "subject": "Başlık",
+    "company": "Şirket ismi",
+    "message": "Mesaj*",
+    "sending": "Gönderiliyor...",
+    "submitButton": "Mesaj Gönder",
+    "successMessage": "Mesajınız başarıyla gönderildi!",
+    "errors": {
+      "requiredFields": "Lütfen tüm zorunlu alanları doldurun.",
+      "submitError": "Mesaj gönderilirken bir hata oluştu."
+    }
+  },
+  "contactInfo": {
+    "email": "Bize e-posta gönderin",
+    "phone": "Bizi Arayın"
+  },
+  "contact" : "İletişim"
+
 
 
 

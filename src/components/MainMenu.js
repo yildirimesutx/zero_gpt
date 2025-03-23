@@ -129,18 +129,18 @@ console.log("lang", lang)
                 <Text style={[styles.menuText, { color: theme.colors.text }]}>Blog</Text>
               </TouchableOpacity> */}
 
-              {/* <TouchableOpacity
+              <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => navigation.navigate('ProjectsScreen')}
+                onPress={() => navigation.navigate('ContactForm')}
               >
                 <Ionicons
-                  name="briefcase-outline"
+                  name="mail-outline"
                   size={24}
                   color={theme.colors.text}
                   style={styles.menuIcon}
                 />
-                <Text style={[styles.menuText, { color: theme.colors.text }]}>Projeler</Text>
-              </TouchableOpacity> */}
+                <Text style={[styles.menuText, { color: theme.colors.text }]}>{i18n.t('contact')}</Text>
+              </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.menuItem}

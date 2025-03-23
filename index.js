@@ -1,4 +1,7 @@
 import { registerRootComponent } from 'expo';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreAllLogs(true); // Tüm uyarıları gizlerr
 
 import App from './App';
 

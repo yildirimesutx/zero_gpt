@@ -11,6 +11,7 @@ import BlogsDetailScreen from '../screens/BlogsDetailScreen';
 import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 import AboutUsScreen from '../screens/AboutUsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import ContactForm from '../screens/ContactForm';
 
 const Stack = createStackNavigator();
 
@@ -75,6 +76,12 @@ const UserNavigation = () => {
       <Stack.Screen
         name="SettingsScreen"
         component={SettingsScreen}
+        options={{ headerShown: false }}
+      /> 
+
+      <Stack.Screen
+        name="ContactForm"
+        component={ContactForm}
         options={{ headerShown: false }}
       /> 
 

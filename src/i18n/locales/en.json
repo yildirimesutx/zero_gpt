@@ -108,7 +108,27 @@
     "sending": "Sending...",
     "send": "Send",
     "email_placeholder": "Your email address"
-  }
+  },
+  "contactForm": {
+    "title": "Get in Touch",
+    "name": "Name*",
+    "email": "Email*",
+    "subject": "Subject",
+    "company": "Company Name",
+    "message": "Message*",
+    "sending": "Sending...",
+    "submitButton": "Send Message",
+    "successMessage": "Your message was sent successfully!",
+    "errors": {
+      "requiredFields": "Please fill in all required fields.",
+      "submitError": "An error occurred while sending your message."
+    }
+  },
+  "contactInfo": {
+    "email": "Send us an email",
+    "phone": "Call us"
+  },
+  "contact" : "Contact"
    
 
 
