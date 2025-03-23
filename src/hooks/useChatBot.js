@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import Constants from 'expo-constants';
+import {BASE_URL} from './baseURL';
 
 const API_URL = Constants.expoConfig.extra.aiApiUrl;
 const API_KEY = Constants.expoConfig.extra.aiApiKey;
+const DEEP_SEARCH_URL = Constants.expoConfig.extra.deepSearchUrl; // Derin arama endpoint URL'si
 
 const useChatBot = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const sendMessage = async (userMessage) => {
+  const sendMessage = async (userMessage, deepSearch = false) => {
     if (!userMessage.trim()) return;
-
-    // Kullanıcı mesajı için ID üretimi: sadece metin gönderiliyor.
     const userMessageId = Date.now();
     const newUserMessage = {
       id: userMessageId.toString(),
@@ -19,37 +19,56 @@ const useChatBot = () => {
       sender: 'user',
     };
 
-    // API isteği yapılmadan önce yerel mesaj state güncelleniyor.
+    // Kullanıcı mesajını state'e ekle
     setMessages((prev) => [...prev, newUserMessage]);
     setLoading(true);
 
     try {
-      // API_KEY artık URL parametresi olarak ekleniyor.
-      const response = await fetch(`${API_URL}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-functions-key' : API_KEY
-        },
-        body: JSON.stringify({
-          "user-prompt": userMessage,
-          "message-id": userMessageId,
-        }),
-      });
-
-      // Yanıtı önce text olarak okuyup, sonra JSON'a çeviriyoruz.
-      const responseText = await response.text();
       let data = {};
-      try {
-        data = responseText ? JSON.parse(responseText) : {};
-      } catch (parseError) {
-        console.error('JSON Parse Error:', parseError, 'Response text:', responseText);
+      if (deepSearch) {
+        // Derin arama endpoint'ine istek gönderiliyor
+        const response = await fetch(`${BASE_URL}/api/send/message`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: userMessage,
+          }),
+        });
+        console.log("derin",response )
+        const responseText = await response.text();
+        try {
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch (parseError) {
+          console.error('JSON Parse Error (Deep Search):', parseError, 'Response text:', responseText);
+        }
+      } else {
+        // Normal endpoint'e istek gönderiliyor
+        const response = await fetch(`${API_URL}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-functions-key': API_KEY,
+          },
+          body: JSON.stringify({
+            "user-prompt": userMessage,
+            "message-id": userMessageId,
+          }),
+        });
+
+        console.log("standart",response )
+        const responseText = await response.text();
+        try {
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch (parseError) {
+          console.error('JSON Parse Error (Normal):', parseError, 'Response text:', responseText);
+        }
       }
 
-      // API response formatı:
-      // { "message_id": 1, "response": "Cevap metni..." }
+      // Bot yanıtı oluşturuluyor
       const botReply = {
-        id: data.message_id ? data.message_id.toString() + '-bot' : Date.now().toString() + '-bot',
+        id: (data.message_id ? data.message_id.toString() : Date.now().toString()) + '-bot',
         text: data.response || 'Cevap alınamadı.',
         sender: 'bot',
       };

@@ -31,9 +31,10 @@ const ChatPage = () => {
   const readOnly = route.params?.readOnly || false;
   const newConversation = route.params?.newConversation || false;
 
-  const { messages, sendMessage, loading, setMessages } = useChatBot();
+  // Derin arastirma butonunun aktifliğini kontrol eden state
+  const [deepSearchActive, setDeepSearchActive] = useState(false);
 
-  // --- YENİ: Post hook'u
+  const { messages, sendMessage, loading, setMessages } = useChatBot();
   const { sendHistoricMail, loading: mailLoading, error: mailError } = useChatHistoricPost();
 
   const [inputText, setInputText] = useState('');
@@ -47,7 +48,7 @@ const ChatPage = () => {
     messages: [],
   });
 
-  // Eklenen: email state (sadece readOnly modunda gözükecek)
+  // readOnly modunda e-posta için state
   const [email, setEmail] = useState('');
 
   const prompts = [
@@ -84,12 +85,14 @@ const ChatPage = () => {
     }
   }, [loading]);
 
-  // Parametre kontrolü
+  // Konuşma geçmişi yükleme veya yeni konuşma oluşturma
   useEffect(() => {
     if (readOnly && conversationId) {
       loadOldConversation(conversationId);
     } else if (newConversation) {
       setMessages([]);
+      createNewConversation();
+    } else if (!readOnly && !conversationId) {
       createNewConversation();
     }
   }, [conversationId, readOnly, newConversation]);
@@ -120,7 +123,7 @@ const ChatPage = () => {
     setCurrentConversation(conv);
   };
 
-  // Mesaj değiştikçe kaydet
+  // Mesaj değiştikçe conversation'ı kaydet
   useEffect(() => {
     if (!readOnly && currentConversation.id) {
       saveConversation({ ...currentConversation, messages });
@@ -143,9 +146,10 @@ const ChatPage = () => {
     }
   };
 
+  // Mesaj gönderme işlemi, deepSearchActive durumuna göre ilgili endpoint'e yönlendirir.
   const handleSend = () => {
     if (!inputText.trim()) return;
-    sendMessage(inputText);
+    sendMessage(inputText, deepSearchActive);
     setInputText('');
     setShowPrompts(false);
   };
@@ -156,19 +160,17 @@ const ChatPage = () => {
     setShowPrompts(false);
   };
 
-  // YENİ: Geçmişi gönder butonu tıklandığında
+  // Geçmişi gönder butonu
   const handleSendHistory = async () => {
     if (!email.trim()) {
       Alert.alert("Uyarı", "Lütfen geçerli bir e-posta adresi giriniz.");
       return;
     }
-    // currentConversation.messages'i mail olarak gönder
     await sendHistoricMail(email, currentConversation.messages);
     if (!mailError) {
       Alert.alert("Bilgi", "Konuşma geçmişi başarıyla gönderildi.");
       setEmail('');
     }
-   
   };
 
   const renderMessageItem = ({ item }) => {
@@ -211,158 +213,181 @@ const ChatPage = () => {
     );
   };
 
-  // readOnly => normal inputu gizliyoruz
+  // readOnly modunda input alanı gizlenir
   const hideInputArea = readOnly;
-  // Eğer readOnly ise bu ekranda messages => currentConversation.messages
-  const displayedMessages = readOnly
-    ? currentConversation.messages
-    : messages;
+  // Eğer readOnly ise messages, currentConversation.messages olarak gösterilir
+  const displayedMessages = readOnly ? currentConversation.messages : messages;
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0} // Üst kısımdaki header yüksekliğine göre ayarlayın
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <FlatList
-        data={
-          loading
-            ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
-            : displayedMessages
-        }
-        keyExtractor={(item, index) => item.id ? item.id.toString() : `msg-${index}`}
-        renderItem={({ item }) => {
-          if (item.id === 'loading') {
-            return (
-              <View style={styles.botContainer}>
-                <Text style={styles.loadingText}>{dots}</Text>
-              </View>
-            );
+      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <FlatList
+          data={
+            loading
+              ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
+              : displayedMessages
           }
-          return renderMessageItem({ item });
-        }}
-        style={styles.messageList}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      />
-
-      {/* readOnly DEĞİLSE promptları göster */}
-      {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
-        <Image
-          source={robotAssistant}
-          style={styles.assistantImage}
-          pointerEvents="none"
+          keyExtractor={(item, index) => item.id ? item.id.toString() : `msg-${index}`}
+          renderItem={({ item }) => {
+            if (item.id === 'loading') {
+              return (
+                <View style={styles.botContainer}>
+                  <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
+                </View>
+              );
+            }
+            return renderMessageItem({ item });
+          }}
+          style={styles.messageList}
+          contentContainerStyle={{ paddingBottom: 20 }}
         />
-      )}
-      {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
-        <View style={styles.promptsContainer}>
-          <FlatList
-            data={prompts}
-            horizontal
-            keyExtractor={(item, idx) => `${idx}`}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
+
+        {/* Promptlar */}
+        {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
+          <Image
+            source={robotAssistant}
+            style={styles.assistantImage}
+            pointerEvents="none"
+          />
+        )}
+        {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
+          <View style={styles.promptsContainer}>
+            <FlatList
+              data={prompts}
+              horizontal
+              keyExtractor={(item, idx) => `${idx}`}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.promptItem,
+                    { backgroundColor: theme.colors.inputBg },
+                  ]}
+                  onPress={() => handlePromptPress(item.title)}
+                >
+                  <Text style={[styles.promptTitle, { color: theme.colors.text }]}>
+                    {item.title}
+                  </Text>
+                  <Text style={[styles.promptDescription, { color: theme.colors.text }]}>
+                    {item.description}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        )}
+
+        {readOnly ? (
+          // E-posta gönderme arayüzü (readOnly modunda)
+          <View style={styles.bottomContainer}>
+            <View
+              style={[
+                styles.inputWrapper,
+                {
+                  backgroundColor: '#f0f0f0',
+                  borderColor: theme.colors.inputBorder,
+                  borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
+                },
+              ]}
+            >
+              <TextInput
+                style={[styles.textInput, { color: '#000' }]}
+                placeholder="E-posta adresiniz"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+              />
               <TouchableOpacity
+                onPress={handleSendHistory}
                 style={[
-                  styles.promptItem,
-                  { backgroundColor: theme.colors.inputBg },
+                  styles.iconWrapper,
+                  { backgroundColor: theme.colors.primary },
                 ]}
-                onPress={() => handlePromptPress(item.title)}
+                disabled={mailLoading}
               >
-                <Text style={[styles.promptTitle, { color: theme.colors.text }]}>
-                  {item.title}
-                </Text>
-                <Text style={[styles.promptDescription, { color: theme.colors.text }]}>
-                  {item.description}
+                <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
+                  {mailLoading ? 'Gönderiliyor...' : 'Gönder'}
                 </Text>
               </TouchableOpacity>
-            )}
-          />
-        </View>
-      )}
-
-      {/* eğer readOnly ise normal input yok, onun yerine e-posta gönderme arayüzü */}
-      {readOnly ? (
-        <View style={styles.bottomContainer}>
-          <View
-            style={[
-              styles.inputWrapper,
-              {
-                backgroundColor: '#f0f0f0',
-                borderColor: theme.colors.inputBorder,
-                borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
-              },
-            ]}
-          >
-            <TextInput
-              style={[styles.textInput, { color: '#000' }]}
-              placeholder="E-posta adresiniz"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              onPress={handleSendHistory}
-              style={[
-                styles.iconWrapper,
-                { backgroundColor: theme.colors.primary },
-              ]}
-              disabled={mailLoading}
-            >
-              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                {mailLoading ? 'Gönderiliyor...' : 'Gönder'}
+            </View>
+            {mailError && (
+              <Text style={{ color: 'red', marginTop: 4, marginLeft: 16 }}>
+                {mailError}
               </Text>
-            </TouchableOpacity>
+            )}
           </View>
-          {mailError && (
-            <Text style={{ color: 'red', marginTop: 4, marginLeft: 16 }}>
-              {mailError}
-            </Text>
-          )}
-        </View>
-      ) : (
-        /* readOnly değilse normal input */
-        <View style={styles.bottomContainer}>
-          <View
-            style={[
-              styles.inputWrapper,
-              {
-                backgroundColor: theme.colors.inputBg,
-                borderColor: theme.colors.inputBorder,
-                borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
-              },
-            ]}
-          >
-            <TextInput
-              style={[styles.textInput, { color: theme.colors.text }]}
-              placeholder={i18n.t('placeholder_message')}
-              placeholderTextColor={
-                theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'
-              }
-              value={inputText}
-              onChangeText={(text) => {
-                setInputText(text);
-                if (text.trim().length > 0) {
-                  setShowPrompts(false);
-                }
-              }}
-              multiline
-            />
-
-            <TouchableOpacity
-              onPress={handleSend}
+        ) : (
+          // Normal input alanı (readOnly değilse)
+          // Mevcut input arka plan stili korunarak; üst satırda metin girişi ve gönder butonu,
+          // alt satırda derin arastirma butonu olacak şekilde düzenlendi.
+          <View style={styles.bottomContainer}>
+            <View
               style={[
-                styles.iconWrapper,
-                { backgroundColor: theme.colors.primary },
+                styles.inputWrapper,
+                {
+                  backgroundColor: theme.colors.inputBg,
+                  borderColor: theme.colors.inputBorder,
+                  borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
+                },
               ]}
             >
-              <Ionicons name="send" size={20} color="#FFF" />
-            </TouchableOpacity>
+              {/* İçeriği iki satıra yerleştirmek için ek container */}
+              <View style={{ flexDirection: 'column', width: '100%' }}>
+                {/* Üst satır: TextInput ve Gönder Butonu */}
+                <View style={styles.inputRow}>
+                  <TextInput
+                    style={[styles.textInput, { color: theme.colors.text }]}
+                    placeholder={i18n.t('placeholder_message')}
+                    placeholderTextColor={theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'}
+                    value={inputText}
+                    onChangeText={(text) => {
+                      setInputText(text);
+                      if (text.trim().length > 0) {
+                        setShowPrompts(false);
+                      }
+                    }}
+                    multiline
+                  />
+                  <TouchableOpacity
+                    onPress={handleSend}
+                    style={[styles.iconWrapper, { backgroundColor: theme.colors.primary }]}
+                  >
+                    <Ionicons name="send" size={20} color="#FFF" />
+                  </TouchableOpacity>
+                </View>
+                {/* Alt satır: Derin Arastirma Butonu */}
+                <View style={styles.deepSearchRow}>
+                <TouchableOpacity
+                  onPress={() => setDeepSearchActive(!deepSearchActive)}
+                  style={[
+                    styles.deepSearchButton,
+                    {
+                      borderColor: deepSearchActive
+                        ? theme.colors.primary
+                        : (theme.colors.background === '#000000' ? '#FFF' : '#000')
+                    }
+                  ]}
+                >
+                  <Ionicons
+                    name="globe-outline"
+                    size={20}
+                    color={deepSearchActive ? theme.colors.primary : theme.colors.text}
+                  />
+                  <Text style={{ marginLeft: 4, color: deepSearchActive ? theme.colors.primary : theme.colors.text }}>
+                    Derin Arastirma
+                  </Text>
+                </TouchableOpacity>
+                </View>
+              </View>
+            </View>
           </View>
-        </View>
-      )}
-    </View>
+        )}
+      </View>
     </KeyboardAvoidingView>
   );
 };
@@ -415,6 +440,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 30,
   },
+  // Mevcut inputWrapper stili (arkaplan, border vs. aynı)
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -422,15 +448,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
+  // Üst satır: TextInput ve gönder butonu
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  // TextInput yüksekliğini iki katına çıkarıyoruz (örneğin 80)
   textInput: {
     flex: 1,
     fontSize: 16,
-    height: 40,
+    height: 60,
   },
   iconWrapper: {
     marginLeft: 8,
     padding: 10,
     borderRadius: 20,
+  },
+  // Alt satır: Derin arastirma butonunun yer aldığı satır
+  deepSearchRow: {
+    marginTop: 8,
+    alignItems: 'flex-start',
+  },
+  deepSearchButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
   },
   loadingText: {
     fontSize: 24,
