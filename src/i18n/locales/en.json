@@ -38,7 +38,27 @@
         "id_2": "Lives Impacted",
         "id_3": "Partner Organizations",
         "id_4": "Volunteers"
-        }
+        },
+    "valuesGridDes" : {
+        "id1Des" : "We approach the environment and natural resources with empathy and sensitivity.",
+        "id2Des" : "We uphold the highest standards of honesty and transparency.",
+        "id3Des" : "We work in collaboration with non-governmental organizations and individuals.",
+        "id4Des" : "We develop sustainable solutions to build a long-term future."
+        },
+        "valuesGridName" : {
+        "id_1" : "Sensitivity",
+        "id_2" : "Integrity",
+        "id_3" : "Collaboration",
+        "id_4" : "Sustainability"
+     },
+     "heroSection": {
+        "title": "Empowering Communities, Transforming Lives.!",
+        "subtitle": "Make a difference by joining Zero Waste. Our organization is dedicated to improving lives through various community projects and initiatives."
+        },
+
+    "logoEn" : "true"    
+
+    
 
 
    
