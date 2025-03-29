@@ -36,18 +36,18 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         {/* Bilgi Bölümü */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <InfoSection />
-        </View>
+        </View> */}
 
         {/* <View style={styles.section}>
           <PartnerSection />
         </View> */}
 
         {/* Değerler Grid */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <ValuesGrid />
-        </View>
+        </View> */}
 
         <View style={styles.section}>
           <SponsorSection />

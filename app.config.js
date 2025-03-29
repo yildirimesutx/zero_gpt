@@ -21,6 +21,7 @@ export default {
       supportsTablet: true
     },
     android: {
+      package: "com.yourcompany.zero_gpt", // Eklenen alan: Uygulamanız için benzersiz paket adı
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff"
@@ -31,7 +32,10 @@ export default {
     },
     extra: {
       aiApiUrl: process.env.AI_API_URL,  
-      aiApiKey: process.env.AI_API_KEY   
+      aiApiKey: process.env.AI_API_KEY,
+      eas: {
+        projectId: "7e2e18b8-fb20-4cbd-a550-33b043b3b63f"
+      }   
     },
     plugins: ["expo-localization"]
   }

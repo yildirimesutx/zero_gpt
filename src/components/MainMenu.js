@@ -30,9 +30,8 @@ const MainMenu = () => {
     setMenuVisible(false);
   };
 
-const lang = i18n.locale
-
-console.log("lang", lang)
+  const lang = i18n.locale;
+  console.log("lang", lang);
 
   return (
     <>
@@ -56,7 +55,7 @@ console.log("lang", lang)
             style={styles.headerAndWelcomeContainer}
           >
             <View style={styles.headerContainer}>
-            {lang && lang.toLowerCase().startsWith("tr") ? 
+              {lang && lang.toLowerCase().startsWith("tr") ? 
                 <Image
                   source={require('../../assets/logo_tr.png')}
                   style={styles.logo}
@@ -66,7 +65,6 @@ console.log("lang", lang)
                   style={styles.logo}
                 />
               }
-              
               <TouchableOpacity onPress={handleMenuPress}>
                 <MaterialIcons name="menu" size={30} color="#fff" />
               </TouchableOpacity>
@@ -92,7 +90,10 @@ console.log("lang", lang)
 
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => navigation.navigate('AboutUsScreen')}
+                onPress={() => {
+                  closeMenu();
+                  navigation.navigate('AboutUsScreen');
+                }}
               >
                 <Ionicons
                   name="information-circle-outline"
@@ -103,35 +104,12 @@ console.log("lang", lang)
                 <Text style={[styles.menuText, { color: theme.colors.text }]}>{i18n.t('about_us')}</Text>
               </TouchableOpacity>
 
-              {/* <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => navigation.navigate('NewsScreen')}
-              >
-                <Ionicons
-                  name="newspaper-outline"
-                  size={24}
-                  color={theme.colors.text}
-                  style={styles.menuIcon}
-                />
-                <Text style={[styles.menuText, { color: theme.colors.text }]}>Haberler</Text>
-              </TouchableOpacity> */}
-
-              {/* <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => navigation.navigate('BlogsScreen')}
-              >
-                <Ionicons
-                  name="book-outline"
-                  size={24}
-                  color={theme.colors.text}
-                  style={styles.menuIcon}
-                />
-                <Text style={[styles.menuText, { color: theme.colors.text }]}>Blog</Text>
-              </TouchableOpacity> */}
-
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => navigation.navigate('ContactForm')}
+                onPress={() => {
+                  closeMenu();
+                  navigation.navigate('ContactForm');
+                }}
               >
                 <Ionicons
                   name="mail-outline"
@@ -144,7 +122,10 @@ console.log("lang", lang)
 
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() => navigation.navigate('SettingsScreen')}
+                onPress={() => {
+                  closeMenu();
+                  navigation.navigate('SettingsScreen');
+                }}
               >
                 <Ionicons
                   name="settings-outline"
@@ -204,7 +185,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 180,
     height: 120,
- 
   },
   welcomeContainer: {
     justifyContent: 'center',

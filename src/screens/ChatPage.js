@@ -168,32 +168,48 @@ const ChatPage = () => {
   const renderMessageItem = ({ item }) => {
     const isUser = item.sender === 'user';
     return (
-      <View style={[styles.messageContainer, isUser ? styles.userContainer : styles.botContainer]}>
+      <View
+        style={[
+          styles.messageContainer,
+          isUser ? styles.userContainer : styles.botContainer,
+        ]}
+      >
         {!isUser && (
-          <Image source={require('../../assets/robot.png')} style={styles.botIcon} />
+          <Image
+            source={require('../../assets/robot.png')}
+            style={styles.botIcon}
+          />
         )}
         <View
           style={[
             styles.messageBubble,
-            isUser ? { backgroundColor: theme.colors.userBubble } : styles.botMessage,
+            isUser
+              ? { backgroundColor: theme.colors.userBubble }
+              : styles.botMessage,
           ]}
+          pointerEvents="box-none"
         >
-          <Text
-            style={[
-              styles.messageText,
-              {
-                color: isUser
-                  ? (theme.colors.background === '#FFFFFF' ? '#000' : '#FFF')
-                  : theme.colors.text,
-              },
-            ]}
-          >
-            {item.text}
-          </Text>
+          {/* Dokunma olaylarını engellemek için metni ek bir View ile sarıyoruz */}
+          <View pointerEvents="none">
+            <Text
+              style={[
+                styles.messageText,
+                {
+                  color: isUser
+                    ? (theme.colors.background === '#FFFFFF' ? '#000' : '#FFF')
+                    : theme.colors.text,
+                },
+              ]}
+            >
+              {item.text}
+            </Text>
+          </View>
         </View>
       </View>
     );
   };
+  
+  
 
   const hideInputArea = readOnly;
   const displayedMessages = readOnly ? currentConversation.messages : messages;
@@ -206,27 +222,39 @@ const ChatPage = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-          <FlatList
-            keyboardShouldPersistTaps="always"
-            data={
-              loading
-                ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
-                : displayedMessages
-            }
-            keyExtractor={(item, index) => (item.id ? item.id.toString() : `msg-${index}`)}
-            renderItem={({ item }) => {
-              if (item.id === 'loading') {
-                return (
-                  <View style={styles.botContainer}>
-                    <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
-                  </View>
-                );
-              }
-              return renderMessageItem({ item });
-            }}
-            style={styles.messageList}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
+        <FlatList
+                  keyboardShouldPersistTaps="always"
+                  data={
+                    loading
+                      ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
+                      : displayedMessages
+                  }
+                  keyExtractor={(item, index) =>
+                    item.id ? item.id.toString() : `msg-${index}`
+                  }
+                  // renderItem kısmında her mesaj öğesini saran ekstra bir View ekledik.
+                  // Bu ekstra View, onStartShouldSetResponderCapture={() => true} özelliğiyle
+                  // dokunma olayını yakalayıp, FlatList'in scroll davranışına iletilmesine yardımcı olur.
+                  renderItem={({ item }) => {
+                    if (item.id === 'loading') {
+                      return (
+                        <View
+                          style={styles.botContainer}
+                          onStartShouldSetResponderCapture={() => true} // Eklenen satır
+                        >
+                          <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
+                        </View>
+                      );
+                    }
+                    return (
+                      <View onStartShouldSetResponderCapture={() => true}> 
+                        {renderMessageItem({ item })}
+                      </View>
+                    );
+                  }}
+                  style={styles.messageList}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                />
 
           {/* Promptlar */}
           {!hideInputArea && showPrompts && inputText.trim().length === 0 && (

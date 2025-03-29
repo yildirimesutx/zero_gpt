@@ -4,13 +4,20 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity, 
+  TouchableWithoutFeedback,
+  Keyboard,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  ScrollView,
   StyleSheet, 
-  ActivityIndicator 
+  ActivityIndicator,
+  Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import i18n from '../i18n/i18n';
 import useSendEmail from '../hooks/useSendEmail';
 import { useTheme } from '../theme/ThemeProvider';
+
 
 const ContactForm = () => {
   const { colors } = useTheme();
@@ -30,7 +37,6 @@ const ContactForm = () => {
   };
 
   const handleSubmit = async () => {
-    // Zorunlu alanlar: name, email, message
     if (!formData.name || !formData.email || !formData.message) {
       setError(i18n.t('contactForm.errors.requiredFields'));
       return;
@@ -50,67 +56,82 @@ const ContactForm = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.header, { color: colors.headerText }]}>{i18n.t('contactForm.title')}</Text>
-      
-      <FormField 
-        label={i18n.t('contactForm.name')}
-        field="name"
-        value={formData.name}
-        onChange={handleChange}
-        colors={colors}
-      />
-      <FormField 
-        label={i18n.t('contactForm.email')}
-        field="email"
-        value={formData.email}
-        onChange={handleChange}
-        colors={colors}
-      />
-      <FormField 
-        label={i18n.t('contactForm.subject')}
-        field="title"
-        value={formData.title}
-        onChange={handleChange}
-        colors={colors}
-      />
-      <FormField 
-        label={i18n.t('contactForm.company')}
-        field="company"
-        value={formData.company}
-        onChange={handleChange}
-        colors={colors}
-      />
-      <FormField 
-        label={i18n.t('contactForm.message')}
-        field="message"
-        value={formData.message}
-        onChange={handleChange}
-        isTextarea
-        colors={colors}
-      />
-
-      {error ? <Text style={[styles.errorText, { color: colors.error || 'red' }]}>{error}</Text> : null}
-      {success ? <Text style={[styles.successText, { color: colors.success || 'green' }]}>{i18n.t('contactForm.successMessage')}</Text> : null}
-
-      <TouchableOpacity 
-        style={[styles.submitButton, { backgroundColor: colors.primary }, loading && styles.disabledButton]}
-        onPress={handleSubmit}
-        disabled={loading}
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 30 : 0} // Gerekirse değeri ayarlayın
       >
-        {loading ? (
-          <>
-            <Text style={styles.submitButtonText}>{i18n.t('contactForm.sending')}</Text>
-            <ActivityIndicator color="#FFF" style={{ marginLeft: 8 }} />
-          </>
-        ) : (
-          <>
-            <Text style={styles.submitButtonText}>{i18n.t('contactForm.submitButton')}</Text>
-            <Ionicons name="send" size={24} color="#FFF" style={{ marginLeft: 8 }} />
-          </>
-        )}
-      </TouchableOpacity>
-    </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <ScrollView
+            contentContainerStyle={[styles.container, { backgroundColor: colors.background, flexGrow: 1, paddingBottom: 300 }]}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentInsetAdjustmentBehavior="always"
+          >
+            <Text style={[styles.header, { color: colors.headerText }]}>{i18n.t('contactForm.title')}</Text>
+            
+            <FormField 
+              label={i18n.t('contactForm.name')}
+              field="name"
+              value={formData.name}
+              onChange={handleChange}
+              colors={colors}
+            />
+            <FormField 
+              label={i18n.t('contactForm.email')}
+              field="email"
+              value={formData.email}
+              onChange={handleChange}
+              colors={colors}
+            />
+            <FormField 
+              label={i18n.t('contactForm.subject')}
+              field="title"
+              value={formData.title}
+              onChange={handleChange}
+              colors={colors}
+            />
+            <FormField 
+              label={i18n.t('contactForm.company')}
+              field="company"
+              value={formData.company}
+              onChange={handleChange}
+              colors={colors}
+            />
+            <FormField 
+              label={i18n.t('contactForm.message')}
+              field="message"
+              value={formData.message}
+              onChange={handleChange}
+              isTextarea
+              colors={colors}
+            />
+
+            {error ? <Text style={[styles.errorText, { color: colors.error || 'red' }]}>{error}</Text> : null}
+            {success ? <Text style={[styles.successText, { color: colors.success || 'green' }]}>{i18n.t('contactForm.successMessage')}</Text> : null}
+
+            <TouchableOpacity 
+              style={[styles.submitButton, { backgroundColor: colors.primary }, loading && styles.disabledButton]}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Text style={styles.submitButtonText}>{i18n.t('contactForm.sending')}</Text>
+                  <ActivityIndicator color="#FFF" style={{ marginLeft: 8 }} />
+                </>
+              ) : (
+                <>
+                  <Text style={styles.submitButtonText}>{i18n.t('contactForm.submitButton')}</Text>
+                  <Ionicons name="send" size={24} color="#FFF" style={{ marginLeft: 8 }} />
+                </>
+              )}
+            </TouchableOpacity>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -135,8 +156,9 @@ const FormField = ({ label, field, value, onChange, isTextarea = false, colors }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,  
+    flexGrow: 1,
+    padding: 20,
+    // Ekstra paddingBottom: 300, klavye açıkken tüm içeriğin görünmesini sağlar.
   },
   header: {
     fontSize: 24,

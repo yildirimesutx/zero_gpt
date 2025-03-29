@@ -110,7 +110,7 @@
   },
   "contactForm": {
     "title": "İletişime Geçin",
-    "name": "Ad*",
+    "name": "Ad Soyad*",
     "email": "E-posta*",
     "subject": "Başlık",
     "company": "Şirket ismi",
