@@ -19,7 +19,7 @@ import { useTheme } from '../theme/ThemeProvider';
 import useChatBot from '../hooks/useChatBot';
 import i18n from '../i18n/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import robotAssistant from '../../assets/robot-assistant.png';
+import robotAssistant from '../../assets/logo_tr_light.png';
 import useChatHistoricPost from '../hooks/useChatHistoricPost';
 
 const ChatPage = () => {
@@ -210,7 +210,7 @@ const ChatPage = () => {
   };
   
   
-
+  const lang = i18n.locale;
   const hideInputArea = readOnly;
   const displayedMessages = readOnly ? currentConversation.messages : messages;
 
@@ -258,8 +258,23 @@ const ChatPage = () => {
 
           {/* Promptlar */}
           {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
-            <Image source={robotAssistant} style={styles.assistantImage} pointerEvents="none" />
+            <>
+              {lang && lang.toLowerCase().startsWith("tr") ? (
+                <Image 
+                  source={robotAssistant} 
+                  style={styles.assistantImage} 
+                  pointerEvents="none" 
+                />
+              ) : (
+                <Image 
+                  source={require('../../assets/logo_new.png')} 
+                  style={styles.assistantImage} 
+                  pointerEvents="none" 
+                />
+              )}
+            </>
           )}
+
           {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
             <View style={styles.promptsContainer}>
               <FlatList
@@ -495,8 +510,8 @@ const styles = StyleSheet.create({
     top: '15%',
     alignSelf: 'center',
     opacity: 0.5,
-    width: 100,
-    height: 100,
+    width: 230,
+    height: 170,
     resizeMode: 'contain',
     zIndex: 2,
     pointerEvents: 'none',
