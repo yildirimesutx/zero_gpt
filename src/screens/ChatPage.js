@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -221,6 +221,14 @@ const ChatPage = () => {
 
   const displayedMessages = messages;
 
+  const flatListRef = useRef(null);
+
+  useEffect(() => {
+    if (flatListRef.current && messages.length > 0) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
@@ -230,6 +238,7 @@ const ChatPage = () => {
       >
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
           <FlatList
+            ref={flatListRef}
             keyboardShouldPersistTaps="always"
             data={
               loading
