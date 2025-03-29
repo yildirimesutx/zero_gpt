@@ -106,7 +106,9 @@
     "history_sent": "Konuşma geçmişi başarıyla gönderildi.",
     "sending": "Gönderiliyor...",
     "send": "Gönder",
-    "email_placeholder": "E-posta adresiniz"
+    "email_placeholder": "E-posta adresiniz",
+    "email_prompt": "Konuşma geçmişini gönder",
+    "cancel": "Vazgeç"
   },
   "contactForm": {
     "title": "İletişime Geçin",

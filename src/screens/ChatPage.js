@@ -11,7 +11,8 @@ import {
   FlatList,
   Platform,
   Image,
-  Alert
+  Alert,
+  Modal,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -28,7 +29,6 @@ const ChatPage = () => {
   const route = useRoute();
 
   const conversationId = route.params?.conversationId || null;
-  const readOnly = route.params?.readOnly || false;
   const newConversation = route.params?.newConversation || false;
 
   const [deepSearchActive, setDeepSearchActive] = useState(false);
@@ -37,17 +37,20 @@ const ChatPage = () => {
 
   const [inputText, setInputText] = useState('');
   const [dots, setDots] = useState('');
-  const [showPrompts, setShowPrompts] = useState(!readOnly);
+  const [showPrompts, setShowPrompts] = useState(true);
   const [currentConversation, setCurrentConversation] = useState({
     id: null,
     title: '',
     time: '',
     messages: [],
   });
+  // E-posta gönderimi için modal ve input state'i
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [email, setEmail] = useState('');
 
   const prompts = i18n.t('prompts');
 
+  // Header ayarlarında sağ tarafa e-posta gönderim ikonu ekliyoruz (mesaj varsa)
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -63,8 +66,14 @@ const ChatPage = () => {
         shadowOpacity: 0,
       },
       headerTintColor: theme.colors.headerText,
+      headerRight: () =>
+        messages && messages.length > 0 && (
+          <TouchableOpacity onPress={() => setShowEmailModal(true)} style={{ marginRight: 16 }}>
+            <Ionicons name="mail-outline" size={24} color={theme.colors.headerText} />
+          </TouchableOpacity>
+        ),
     });
-  }, [navigation, theme]);
+  }, [navigation, theme, messages]);
 
   useEffect(() => {
     if (loading) {
@@ -76,15 +85,15 @@ const ChatPage = () => {
   }, [loading]);
 
   useEffect(() => {
-    if (readOnly && conversationId) {
+    if (conversationId) {
       loadOldConversation(conversationId);
     } else if (newConversation) {
       setMessages([]);
       createNewConversation();
-    } else if (!readOnly && !conversationId) {
+    } else if (!conversationId) {
       createNewConversation();
     }
-  }, [conversationId, readOnly, newConversation]);
+  }, [conversationId, newConversation]);
 
   const loadOldConversation = async (id) => {
     try {
@@ -94,6 +103,7 @@ const ChatPage = () => {
         const found = arr.find((c) => c.id === id);
         if (found) {
           setCurrentConversation(found);
+          setMessages(found.messages);
         }
       }
     } catch (error) {
@@ -112,8 +122,9 @@ const ChatPage = () => {
     setCurrentConversation(conv);
   };
 
+  // Her durumda konuşma güncellensin
   useEffect(() => {
-    if (!readOnly && currentConversation.id) {
+    if (currentConversation.id) {
       saveConversation({ ...currentConversation, messages });
     }
   }, [messages]);
@@ -147,7 +158,8 @@ const ChatPage = () => {
     setShowPrompts(false);
   };
 
-  const handleSendHistory = async () => {
+  // Fonksiyon: Modal içindeki e-postanın gönderilmesi
+  const handleSendEmail = async () => {
     if (!email.trim()) {
       Alert.alert(
         i18n.t('send_history.warning_title'),
@@ -162,6 +174,7 @@ const ChatPage = () => {
         i18n.t('send_history.history_sent')
       );
       setEmail('');
+      setShowEmailModal(false);
     }
   };
 
@@ -183,13 +196,10 @@ const ChatPage = () => {
         <View
           style={[
             styles.messageBubble,
-            isUser
-              ? { backgroundColor: theme.colors.userBubble }
-              : styles.botMessage,
+            isUser ? { backgroundColor: theme.colors.userBubble } : styles.botMessage,
           ]}
           pointerEvents="box-none"
         >
-          {/* Dokunma olaylarını engellemek için metni ek bir View ile sarıyoruz */}
           <View pointerEvents="none">
             <Text
               style={[
@@ -208,11 +218,8 @@ const ChatPage = () => {
       </View>
     );
   };
-  
-  
-  const lang = i18n.locale;
-  const hideInputArea = readOnly;
-  const displayedMessages = readOnly ? currentConversation.messages : messages;
+
+  const displayedMessages = messages;
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -222,60 +229,58 @@ const ChatPage = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <FlatList
-                  keyboardShouldPersistTaps="always"
-                  data={
-                    loading
-                      ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
-                      : displayedMessages
-                  }
-                  keyExtractor={(item, index) =>
-                    item.id ? item.id.toString() : `msg-${index}`
-                  }
-                  // renderItem kısmında her mesaj öğesini saran ekstra bir View ekledik.
-                  // Bu ekstra View, onStartShouldSetResponderCapture={() => true} özelliğiyle
-                  // dokunma olayını yakalayıp, FlatList'in scroll davranışına iletilmesine yardımcı olur.
-                  renderItem={({ item }) => {
-                    if (item.id === 'loading') {
-                      return (
-                        <View
-                          style={styles.botContainer}
-                          onStartShouldSetResponderCapture={() => true} // Eklenen satır
-                        >
-                          <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
-                        </View>
-                      );
-                    }
-                    return (
-                      <View onStartShouldSetResponderCapture={() => true}> 
-                        {renderMessageItem({ item })}
-                      </View>
-                    );
-                  }}
-                  style={styles.messageList}
-                  contentContainerStyle={{ paddingBottom: 20 }}
-                />
+          <FlatList
+            keyboardShouldPersistTaps="always"
+            data={
+              loading
+                ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
+                : displayedMessages
+            }
+            keyExtractor={(item, index) =>
+              item.id ? item.id.toString() : `msg-${index}`
+            }
+            renderItem={({ item }) => {
+              if (item.id === 'loading') {
+                return (
+                  <View
+                    style={styles.botContainer}
+                    onStartShouldSetResponderCapture={() => true}
+                  >
+                    <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
+                  </View>
+                );
+              }
+              return (
+                <View onStartShouldSetResponderCapture={() => true}>
+                  {renderMessageItem({ item })}
+                </View>
+              );
+            }}
+            style={styles.messageList}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
 
-          {/* Promptlar */}
-          {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
-            <>
-              {lang && lang.toLowerCase().startsWith("tr") ? (
-                <Image 
-                  source={robotAssistant} 
-                  style={styles.assistantImage} 
-                  pointerEvents="none" 
-                />
-              ) : (
-                <Image 
-                  source={require('../../assets/logo_new.png')} 
-                  style={styles.assistantImage} 
-                  pointerEvents="none" 
-                />
-              )}
-            </>
-          )}
+          {/* Promtlar */}
+          {showPrompts && inputText.trim().length === 0 && messages.length === 0 && (
+              <>
+                {i18n.locale && i18n.locale.toLowerCase().startsWith("tr") ? (
+                  <Image 
+                    source={robotAssistant} 
+                    style={styles.assistantImage} 
+                    pointerEvents="none" 
+                  />
+                ) : (
+                  <Image 
+                    source={require('../../assets/logo_new.png')} 
+                    style={styles.assistantImage} 
+                    pointerEvents="none" 
+                  />
+                )}
+              </>
+            )}
 
-          {!hideInputArea && showPrompts && inputText.trim().length === 0 && (
+
+          {showPrompts && inputText.trim().length === 0 && (
             <View style={styles.promptsContainer}>
               <FlatList
                 keyboardShouldPersistTaps="always"
@@ -296,106 +301,104 @@ const ChatPage = () => {
             </View>
           )}
 
-          {readOnly ? (
-            // E-posta gönderim alanı (readOnly)
-            <View style={styles.bottomContainer}>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  {
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    backgroundColor: theme.colors.inputBg,
-                    borderColor: theme.colors.inputBorder,
-                    borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
-                  },
-                ]}
-              >
+          {/* Normal mesaj gönderme alanı */}
+          <View style={styles.bottomContainer}>
+            <View
+              style={[
+                styles.inputWrapper,
+                {
+                  flexDirection: 'column',
+                  backgroundColor: theme.colors.inputBg,
+                  borderColor: theme.colors.inputBorder,
+                  borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
+                },
+              ]}
+            >
+              <View style={styles.inputRow}>
                 <TextInput
-                  style={[styles.emailInput, { backgroundColor: theme.colors.inputBg, color: theme.colors.text }]}
+                  style={[styles.textInput, { color: theme.colors.text }]}
+                  placeholder={i18n.t('placeholder_message')}
+                  placeholderTextColor={theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'}
+                  value={inputText}
+                  onChangeText={(text) => {
+                    setInputText(text);
+                    if (text.trim().length > 0) {
+                      setShowPrompts(false);
+                    }
+                  }}
+                  multiline
+                  editable={true}
+                />
+                <TouchableOpacity
+                  onPress={handleSend}
+                  style={[styles.iconWrapper, { backgroundColor: theme.colors.primary, marginLeft: 8 }]}
+                >
+                  <Ionicons name="send" size={20} color="#FFF" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.deepSearchRow}>
+                <TouchableOpacity
+                  onPress={() => setDeepSearchActive(!deepSearchActive)}
+                  style={[
+                    styles.deepSearchButton,
+                    {
+                      borderColor: deepSearchActive
+                        ? theme.colors.primary
+                        : (theme.colors.background === '#000000' ? '#FFF' : '#000'),
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="globe-outline"
+                    size={20}
+                    color={deepSearchActive ? theme.colors.primary : theme.colors.text}
+                  />
+                  <Text style={{ marginLeft: 4, color: deepSearchActive ? theme.colors.primary : theme.colors.text }}>
+                    {i18n.t('deep_search')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          {/* Email gönderimi için modal */}
+          <Modal visible={showEmailModal} transparent animationType="fade">
+            <View style={styles.modalOverlay}>
+              <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+                  {i18n.t('send_history.email_prompt')}
+                </Text>
+                <TextInput
+                  style={[styles.modalInput, { color: theme.colors.text, borderColor: theme.colors.inputBorder }]}
                   placeholder={i18n.t('send_history.email_placeholder')}
                   placeholderTextColor="#999"
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
-                  editable={true}
                 />
-                <TouchableOpacity
-                  onPress={handleSendHistory}
-                  style={[styles.emailButton, { backgroundColor: theme.colors.primary, marginLeft: 8 }]}
-                  disabled={mailLoading}
-                >
-                  <Text style={styles.emailButtonText}>
-                    {mailLoading ? i18n.t('send_history.sending') : i18n.t('send_history.send')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              {mailError && (
-                <Text style={styles.errorText}>{mailError}</Text>
-              )}
-            </View>
-          ) : (
-            // Normal mesaj gönderme alanı (readOnly değilse)
-            <View style={styles.bottomContainer}>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  {
-                    flexDirection: 'column',
-                    backgroundColor: theme.colors.inputBg,
-                    borderColor: theme.colors.inputBorder,
-                    borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
-                  },
-                ]}
-              >
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={[styles.textInput, { color: theme.colors.text }]}
-                    placeholder={i18n.t('placeholder_message')}
-                    placeholderTextColor={theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'}
-                    value={inputText}
-                    onChangeText={(text) => {
-                      setInputText(text);
-                      if (text.trim().length > 0) {
-                        setShowPrompts(false);
-                      }
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setEmail('');
+                      setShowEmailModal(false);
                     }}
-                    multiline
-                    editable={true}
-                  />
-                  <TouchableOpacity
-                    onPress={handleSend}
-                    style={[styles.iconWrapper, { backgroundColor: theme.colors.primary, marginLeft: 8 }]}
+                    style={[styles.modalButton, { backgroundColor: '#aaa' }]}
                   >
-                    <Ionicons name="send" size={20} color="#FFF" />
+                    <Text style={styles.modalButtonText}>{i18n.t('send_history.cancel')}</Text>
                   </TouchableOpacity>
-                </View>
-                <View style={styles.deepSearchRow}>
                   <TouchableOpacity
-                    onPress={() => setDeepSearchActive(!deepSearchActive)}
-                    style={[
-                      styles.deepSearchButton,
-                      {
-                        borderColor: deepSearchActive
-                          ? theme.colors.primary
-                          : (theme.colors.background === '#000000' ? '#FFF' : '#000'),
-                      },
-                    ]}
+                    onPress={handleSendEmail}
+                    style={[styles.modalButton, { backgroundColor: theme.colors.primary }]}
+                    disabled={mailLoading}
                   >
-                    <Ionicons
-                      name="globe-outline"
-                      size={20}
-                      color={deepSearchActive ? theme.colors.primary : theme.colors.text}
-                    />
-                    <Text style={{ marginLeft: 4, color: deepSearchActive ? theme.colors.primary : theme.colors.text }}>
-                      {i18n.t('deep_search')}
+                    <Text style={styles.modalButtonText}>
+                      {mailLoading ? i18n.t('send_history.sending') : i18n.t('send_history.send')}
                     </Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
-          )}
+          </Modal>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
@@ -516,25 +519,40 @@ const styles = StyleSheet.create({
     zIndex: 2,
     pointerEvents: 'none',
   },
-  emailInput: {
+  modalOverlay: {
     flex: 1,
-    fontSize: 16,
-    height: 50,
-    paddingVertical: 8,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  emailButton: {
-    marginLeft: 8,
-    paddingHorizontal: 16,
+  modalContent: {
+    width: '80%',
+    borderRadius: 12,
+    padding: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  modalButton: {
     paddingVertical: 10,
-    borderRadius: 20,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginLeft: 8,
   },
-  emailButtonText: {
+  modalButtonText: {
     color: '#FFF',
     fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 4,
-    marginLeft: 16,
   },
 });

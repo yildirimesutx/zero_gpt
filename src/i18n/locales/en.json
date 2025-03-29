@@ -107,7 +107,9 @@
     "history_sent": "Chat history sent successfully.",
     "sending": "Sending...",
     "send": "Send",
-    "email_placeholder": "Your email address"
+    "email_placeholder": "Your email address",
+    "email_prompt": "Send conversation history",
+    "cancel": "Cancel"
   },
   "contactForm": {
     "title": "Get in Touch",

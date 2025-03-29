@@ -169,7 +169,7 @@ const CustomDrawerContent = (props) => {
                 onPress={() => {
                   navigation.navigate('ChatPage', {
                     conversationId: conv.id,
-                    readOnly: true,
+                    // readOnly: true,
                   });
                 }}
                 style={styles.conversationContent}
