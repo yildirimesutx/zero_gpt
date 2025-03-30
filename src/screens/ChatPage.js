@@ -22,6 +22,7 @@ import i18n from '../i18n/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import robotAssistant from '../../assets/logo_tr_light.png';
 import useChatHistoricPost from '../hooks/useChatHistoricPost';
+import { StatusBar } from 'expo-status-bar';
 
 const ChatPage = () => {
   const theme = useTheme();
@@ -230,6 +231,12 @@ const ChatPage = () => {
   }, [messages]);
 
   return (
+    <>
+    <StatusBar
+        // Arkaplan siyahsa beyaz ikonlar ve metin görünmesi için:
+        barStyle={theme.colors.statusBarStyle}
+        backgroundColor={theme.colors.statusBarBackground}
+      />
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -411,6 +418,7 @@ const ChatPage = () => {
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
+    </>
   );
 };
 

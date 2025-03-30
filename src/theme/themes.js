@@ -25,6 +25,10 @@ export const LightTheme = {
 
     // Light tema için baloncuk arka planı
     bubbleBg: '#E6E6E6',
+
+    // StatusBar için eklediklerimiz
+    statusBarStyle: 'dark-content',   // İkon ve yazı rengi
+    statusBarBackground: '#FFFFFF',   // Android için arka plan rengi
   },
 };
 
@@ -53,7 +57,11 @@ export const DarkTheme = {
     headerBg: '#000000',
     headerText: '#FFFFFF',
 
-    // Dark tema için baloncuk arka planı (Dilediğiniz koyu bir ton)
+    // Dark tema için baloncuk arka planı
     bubbleBg: '#222222',
+
+    // StatusBar için eklediklerimiz
+    statusBarStyle: 'light-content',  // İkon ve yazı rengi
+    statusBarBackground: '#333333',   // Android için arka plan rengi
   },
 };
