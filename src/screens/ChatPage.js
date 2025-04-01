@@ -14,8 +14,7 @@ import {
   Alert,
   Modal,
   PanResponder,
-  Clipboard, 
-  ToastAndroid
+  Clipboard, ToastAndroid
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -182,56 +181,69 @@ const ChatPage = () => {
     }
   };
 
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => false,
+    onMoveShouldSetPanResponder: (evt, gestureState) => {
+      // Dikey hareket 5 pikselin üzerindeyse pan responder'ı aktif et
+      return Math.abs(gestureState.dy) > 5;
+    },
+    onPanResponderMove: () => {
+      // Bu aşamada parent (FlatList) scroll davranışını devralabilir
+    },
+    onPanResponderTerminationRequest: () => true,
+  });
 
 
-  const renderMessageItem = ({ item }) => {
-    const isUser = item.sender === 'user';
-    return (
+
+  // renderMessageItem fonksiyonu:
+const renderMessageItem = ({ item }) => {
+  const isUser = item.sender === 'user';
+  return (
+    <View
+      style={[
+        styles.messageContainer,
+        isUser ? styles.userContainer : styles.botContainer,
+      ]}
+    >
+      {!isUser && (
+        <Image
+          source={require('../../assets/robot.png')}
+          style={styles.botIcon}
+        />
+      )}
       <View
         style={[
-          styles.messageContainer,
-          isUser ? styles.userContainer : styles.botContainer,
+          styles.messageBubble,
+          isUser ? { backgroundColor: theme.colors.userBubble } : styles.botMessage,
         ]}
+        // Dokunma olaylarının alt bileşene iletilmesini sağlıyoruz:
+        pointerEvents="box-none"
       >
-        {!isUser && (
-          <Image
-            source={require('../../assets/robot.png')}
-            style={styles.botIcon}
-          />
-        )}
-        <View
-          style={[
-            styles.messageBubble,
-            isUser ? { backgroundColor: theme.colors.userBubble } : styles.botMessage,
-          ]}
-          // pointerEvents="box-none"
-        >
-          <View 
-          // pointerEvents="none"
+        <View pointerEvents="auto">
+        <Text
+            selectable
+            onLongPress={() => {
+              Clipboard.setString(item.text);
+              ToastAndroid.show('Metin kopyalandı!', ToastAndroid.SHORT);
+            }}
+            style={[
+              styles.messageText,
+              {
+                color: isUser
+                  ? (theme.colors.background === '#FFFFFF' ? '#000' : '#FFF')
+                  : theme.colors.text,
+              },
+            ]}
           >
-            <Text
-              selectable
-              onLongPress={() => {
-                Clipboard.setString(item.text);
-                ToastAndroid.show('Metin kopyalandı!', ToastAndroid.SHORT);
-              }}
-              style={[
-                styles.messageText,
-                {
-                  color: isUser
-                    ? (theme.colors.background === '#FFFFFF' ? '#000' : '#FFF')
-                    : theme.colors.text,
-                },
-              ]}
-            >
-              {item.text}
-            </Text>
-          </View>
+            {item.text}
+          </Text>
         </View>
       </View>
-    );
-  };
+    </View>
+  );
+};
 
+  
   const displayedMessages = messages;
 
   const flatListRef = useRef(null);
@@ -258,10 +270,10 @@ const ChatPage = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-          <FlatList
+        <FlatList
             ref={flatListRef}
             keyboardShouldPersistTaps="always"
-             keyboardDismissMode="on-drag"
+            keyboardDismissMode="on-drag"
             data={
               loading
                 ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
@@ -273,21 +285,13 @@ const ChatPage = () => {
             renderItem={({ item }) => {
               if (item.id === 'loading') {
                 return (
-                  <View
-                    style={styles.botContainer}
-                    onStartShouldSetResponderCapture={() => true}
-                  >
+                  <View style={styles.botContainer}>
                     <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
                   </View>
                 );
               }
-              return (
-                <View 
-                onStartShouldSetResponderCapture={() => true}
-                >
-                  {renderMessageItem({ item })}
-                </View>
-              );
+              // Ekstra onStartShouldSetResponderCapture kaldırıldı
+              return renderMessageItem({ item });
             }}
             style={styles.messageList}
             contentContainerStyle={{ paddingBottom: 20 }}
