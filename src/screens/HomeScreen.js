@@ -15,6 +15,7 @@ import AIAssistantSection from '../components/AIAssistantSection';
 import News from '../components/News';
 import PartnerSection from './PartnerSection';
 import SponsorSection from './SponsorSection';
+import SosyalMedyaFooter from '../components/SosyalMedyaFootor';
 
 const HomeScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -52,6 +53,12 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.section}>
           <SponsorSection />
         </View>
+
+
+        <View style={styles.section}>
+            <SosyalMedyaFooter />
+          </View>
+        
       </ScrollView>
 
       {/* Sohbet Düğmesi (Örnek) */}

@@ -1,10 +1,11 @@
 import React from 'react';
-import { FlatList, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { FlatList, Image, StyleSheet, TouchableOpacity, Linking, View } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
 import Sponsor1 from '../../assets/common/Sponsor1.png';
 import Sponsor2 from '../../assets/common/Sponsor2.png';
 import Sponsor3 from '../../assets/common/Sponsor3.png';
 import Sponsor4 from '../../assets/common/Sponsor4.png';
+import SosyalMedyaFooter from '../components/SosyalMedyaFootor';
 
 const sponsors = [
   { id: 1, color: '#67b437', img: Sponsor1, url: 'https://unhabitat.org/' },
@@ -42,6 +43,7 @@ const SponsorSection = () => {
   );
 
   return (
+    <>
     <FlatList
       data={sponsors}
       keyExtractor={(item) => item.id.toString()}
@@ -50,6 +52,10 @@ const SponsorSection = () => {
       columnWrapperStyle={styles.columnWrapper}
       contentContainerStyle={styles.flatListContent}
     />
+
+  
+
+    </>
   );
 };
 

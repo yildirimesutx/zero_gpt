@@ -13,6 +13,7 @@ import {
   Image,
   Alert,
   Modal,
+  PanResponder,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -179,6 +180,8 @@ const ChatPage = () => {
     }
   };
 
+
+
   const renderMessageItem = ({ item }) => {
     const isUser = item.sender === 'user';
     return (
@@ -199,10 +202,13 @@ const ChatPage = () => {
             styles.messageBubble,
             isUser ? { backgroundColor: theme.colors.userBubble } : styles.botMessage,
           ]}
-          pointerEvents="box-none"
+          // pointerEvents="box-none"
         >
-          <View pointerEvents="none">
+          <View 
+          // pointerEvents="none"
+          >
             <Text
+             selectable
               style={[
                 styles.messageText,
                 {
@@ -230,6 +236,8 @@ const ChatPage = () => {
     }
   }, [messages]);
 
+ 
+
   return (
     <>
     <StatusBar
@@ -247,6 +255,7 @@ const ChatPage = () => {
           <FlatList
             ref={flatListRef}
             keyboardShouldPersistTaps="always"
+             keyboardDismissMode="on-drag"
             data={
               loading
                 ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
@@ -267,7 +276,9 @@ const ChatPage = () => {
                 );
               }
               return (
-                <View onStartShouldSetResponderCapture={() => true}>
+                <View 
+                onStartShouldSetResponderCapture={() => true}
+                >
                   {renderMessageItem({ item })}
                 </View>
               );
