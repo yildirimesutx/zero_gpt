@@ -14,6 +14,8 @@ import {
   Alert,
   Modal,
   PanResponder,
+  Clipboard, 
+  ToastAndroid
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -208,7 +210,11 @@ const ChatPage = () => {
           // pointerEvents="none"
           >
             <Text
-             selectable
+              selectable
+              onLongPress={() => {
+                Clipboard.setString(item.text);
+                ToastAndroid.show('Metin kopyalandı!', ToastAndroid.SHORT);
+              }}
               style={[
                 styles.messageText,
                 {
