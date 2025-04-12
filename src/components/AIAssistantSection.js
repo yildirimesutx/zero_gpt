@@ -25,14 +25,14 @@ const AIAssistantSection = ({ navigation }) => {
         source={require('../../assets/robot-assistant.png')}
         style={styles.image}
       />
-      <Text style={[styles.heading, { color: isDark ? '#fff' : '#004d00' }]}>
+      <Text style={[styles.heading, { color: isDark ? '#fff' : '#48a03e' }]}>
         {i18n.t('ai_assistant_section.header')}
       </Text>
       <Text style={[styles.description, { color: isDark ? '#ccc' : '#666' }]}>
       {i18n.t('ai_assistant_section.text')}
       </Text>
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: isDark ? '#11A624' : '#004d00' }]}
+        style={[styles.button, { backgroundColor: isDark ? '#11A624' : '#67c04d' }]}
         onPress={() => navigation.navigate('GptPage')}
       >
         <Text style={styles.buttonText}> {i18n.t('ai_assistant_section.buton')}</Text>

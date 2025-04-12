@@ -2,7 +2,7 @@ export const LightTheme = {
   colors: {
     background: '#FFFFFF',
     text: '#000000',
-    primary: '#2196F3',
+    primary: '#1e90ff',
 
     // Kullanıcı baloncuk rengi
     userBubble: '#E6E6E6', // Açık gri

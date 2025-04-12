@@ -8,10 +8,10 @@ import Sponsor4 from '../../assets/common/Sponsor4.png';
 import SosyalMedyaFooter from '../components/SosyalMedyaFootor';
 
 const sponsors = [
-  { id: 1, color: '#67b437', img: Sponsor1, url: 'https://unhabitat.org/' },
+  { id: 1, color: '#ffffff', img: Sponsor1, url: 'https://unhabitat.org/' },
   { id: 2, color: '#ffffff', img: Sponsor2, url: 'https://sifiratikvakfi.org/' },
-  { id: 3, color: '#009fe3', img: Sponsor3, url: 'https://www.unep.org/' },
-  { id: 4, color: '#f5f5f5', img: Sponsor4, url: 'https://www.turktelekom.com.tr/' },
+  { id: 3, color: '#ffffff', img: Sponsor3, url: 'https://www.unep.org/' },
+  { id: 4, color: '#ffffff', img: Sponsor4, url: 'https://www.turktelekom.com.tr/' },
 ];
 
 const SponsorSection = () => {
@@ -37,6 +37,7 @@ const SponsorSection = () => {
           styles.image,
           item.id === 2 && styles.biggerImage,
           item.id === 4 && styles.extraBiggerImage,
+          item.id === 3 && styles.shrinkImage
         ]}
       />
     </TouchableOpacity>
@@ -63,7 +64,7 @@ export default SponsorSection;
 
 const styles = StyleSheet.create({
   flatListContent: {
-    padding: 8,
+    padding: 3,
   },
   columnWrapper: {
     justifyContent: 'space-evenly',
@@ -97,5 +98,11 @@ const styles = StyleSheet.create({
   extraBiggerImage: {
     width: '90%',
     height: '90%',
+  },
+  shrinkImage: {
+    width: '60%',    
+    height: '60%',
+    borderRadius: 0,  
+    resizeMode: 'contain',
   },
 });

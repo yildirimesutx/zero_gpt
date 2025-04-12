@@ -37,12 +37,12 @@ const MainMenu = () => {
     <>
       {/* Status Bar ve Arka Plan Uyumu */}
       <LinearGradient
-        colors={['#004d00', '#004d00']}
+        colors={['#397d31', '#48a03e']}
         style={styles.statusBarBackground}
       >
         <StatusBar
           translucent
-          backgroundColor="#004d00"
+          backgroundColor="#397d31"
           barStyle="light-content"
         />
       </LinearGradient>
@@ -51,7 +51,7 @@ const MainMenu = () => {
         <View style={styles.containerWrapper}>
           {/* Header ve Karşılama Mesajı */}
           <LinearGradient
-            colors={['#004d00', '#33cc66']}
+            colors={['#48a03e', '#67c04d']}
             style={styles.headerAndWelcomeContainer}
           >
             <View style={styles.headerContainer}>

@@ -36,16 +36,21 @@ const AboutUsScreen = () => {
           { backgroundColor: colors.background, flexGrow: 1 }
         ]}
       >
-        <Image 
+        {/* <Image 
           source={require('../../assets/about_us_main_mobile.jpg')} 
           style={styles.image} 
           resizeMode="cover" 
-        />
+        // /> */}
         <Text style={[styles.headerText, { color: colors.headerText }]}>{i18n.t('about_us')}</Text>
         <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-1')}</Text>
         <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-2')}</Text>
         <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-3')}</Text>
         <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-4')}</Text>
+        <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-5')}</Text>
+        <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-6')}</Text>
+        <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-7')}</Text>
+        <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-8')}</Text>
+        <Text style={[styles.contentText, { color: colors.text }]}>{i18n.t('about_page_content-9')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

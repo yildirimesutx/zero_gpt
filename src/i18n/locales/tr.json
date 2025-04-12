@@ -7,12 +7,16 @@
     "login": "Giriş Yap",
     "login_google" : "Google ile Devam Et",
     "placeholder_pass" : "Şifre",
-    "about_page_content-1": "Sıfır Atık Vakfı, Cumhurbaşkanı Recep Tayyip Erdoğan’ın eşi Emine Erdoğan’ın himayesinde, 2023 yılında kurulmuş bir vakıftır.",
-    "about_page_content-2" : "Vakıf, Sıfır Atık Projesi’nin yaygınlaştırılması ve sürdürülebilirliğinin sağlanması amacıyla faaliyet göstermektedir. Her bireyin ve kurumun sıfır atık anlayışını benimsemesi için çalışarak, çevreye duyarlı bir toplum oluşturmayı hedeflemektedir.",
-     "about_page_content-3" :"Vakfın temel hedefleri arasında sıfır atık bilincini artırmak, bilgi ve deneyim paylaşımını teşvik etmek, bu alandaki uygulamaları geliştirmek ve yaygınlaştırmak yer almaktadır. ",
-     
-      "about_page_content-4" :"Bu doğrultuda, eğitim, araştırma, proje geliştirme ve uygulama gibi alanlarda kapsamlı çalışmalar yürütülmektedir.Sıfır atık uygulamalarının her alanda hayata geçirilmesini sağlamak için kamu kurumları, özel sektör ve sivil toplum kuruluşlarıyla işbirliği içinde çalışmalar sürdürülmekte, ayrıca uluslararası düzeyde sıfır atık projeleri tanıtılarak dünya çapında bir etki yaratılması amaçlanmaktadır.",
-    
+    "about_page_content-1": "Zero Waste GPT: Yapay Zekâ ile Sıfır Atık Hareketinde Yeni Dönem",
+    "about_page_content-2": "Sıfır Atık Vakfı olarak, sürdürülebilir bir gelecek hedefiyle çıktığımız bu yolda teknolojiyle doğayı buluşturuyoruz. Yapay zekâ destekli projemiz Zero Waste GPT, sıfır atık bilincini yaygınlaştırmak, bireyleri ve kurumları bu dönüşümün bir parçası hâline getirmek amacıyla hayata geçirildi.",
+    "about_page_content-3": "Zero Waste GPT; geri dönüşüm, atık yönetimi, çevre dostu alışkanlıklar, sürdürülebilir yaşam önerileri ve sıfır atık mevzuatları gibi konularda 7/24 destek sunan, yapay zekâ tabanlı bir bilgi ve rehberlik platformudur.",
+    "about_page_content-4": "Kullanıcı dostu yapısıyla herkesin anlayabileceği dilde bilgi sunar, eğitici içeriklerle farkındalık yaratır, çözüm odaklı yönlendirmelerle bireysel ve kurumsal dönüşüm süreçlerine katkı sağlar.",
+    "about_page_content-5": "Bu proje ile; evlerden belediyelere, okullardan iş yerlerine kadar her alanda sıfır atık uygulamaları yaygınlaşacak, gençlerin ve çocukların çevre bilinci güçlenecek, doğayla uyumlu teknolojik çözümlerle daha yaşanabilir bir dünya mümkün kılınacak.",
+    "about_page_content-6": "Sıfır atık artık bir seçenek değil, bir zorunluluk. Zero Waste GPT ise bu zorunluluğu kolay, erişilebilir ve ilham verici hâle getiriyor.",
+    "about_page_content-7": "Geleceği birlikte şekillendirmek için siz de bu dönüşümün parçası olun!",
+    "about_page_content-8": "Sıfır Atık Vakfı",
+    "about_page_content-9": "“Doğayla uyum içinde, teknolojiyle ileriye…”",
+      
     
     "about_us": "Hakkımızda",
     "partners": {
