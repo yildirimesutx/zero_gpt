@@ -8,8 +8,9 @@ import Sponsor4 from '../../assets/common/Sponsor4.png';
 import SosyalMedyaFooter from '../components/SosyalMedyaFootor';
 
 const sponsors = [
-  { id: 1, color: '#ffffff', img: Sponsor1, url: 'https://unhabitat.org/' },
-  { id: 2, color: '#ffffff', img: Sponsor2, url: 'https://sifiratikvakfi.org/' },
+  
+  { id: 1, color: '#ffffff', img: Sponsor2, url: 'https://sifiratikvakfi.org/' },
+  { id: 2, color: '#ffffff', img: Sponsor1, url: 'https://unhabitat.org/' },
   { id: 3, color: '#ffffff', img: Sponsor3, url: 'https://www.unep.org/' },
   { id: 4, color: '#ffffff', img: Sponsor4, url: 'https://www.turktelekom.com.tr/' },
 ];
@@ -35,7 +36,7 @@ const SponsorSection = () => {
         source={item.img}
         style={[
           styles.image,
-          item.id === 2 && styles.biggerImage,
+          item.id === 1 && styles.biggerImage,
           item.id === 4 && styles.extraBiggerImage,
           item.id === 3 && styles.shrinkImage
         ]}

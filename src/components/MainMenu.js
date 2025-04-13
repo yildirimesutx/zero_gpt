@@ -55,16 +55,21 @@ const MainMenu = () => {
             style={styles.headerAndWelcomeContainer}
           >
             <View style={styles.headerContainer}>
-              {lang && lang.toLowerCase().startsWith("tr") ? 
-                <Image
-                  source={require('../../assets/logo_tr.png')}
-                  style={styles.logo}
-                /> :
-                <Image
-                  source={require('../../assets/logo_new2.png')}
-                  style={styles.logo}
-                />
-              }
+              {/* Logo alanı container'ı */}
+              <View style={styles.logoContainer}>
+                {lang && lang.toLowerCase().startsWith("tr") ? 
+                  <Image
+                    source={require('../../assets/logo_tr.png')}
+                    style={styles.logoImage}
+                    resizeMode="contain"
+                  /> :
+                  <Image
+                    source={require('../../assets/logo_new2.png')}
+                    style={styles.logoImage}
+                    resizeMode="contain"
+                  />
+                }
+              </View>
               <TouchableOpacity onPress={handleMenuPress}>
                 <MaterialIcons name="menu" size={30} color="#fff" />
               </TouchableOpacity>
@@ -182,9 +187,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     height: 70,
   },
-  logo: {
-    width: 180,
+  // Logo için container: Belirlediğimiz boyutlarda kalmasını sağlıyoruz
+  logoContainer: {
+    width: 140,
     height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  // Logonun içindeki image: container boyutunu dolduracak şekilde ayarlanıyor
+  logoImage: {
+    width: '100%',
+    height: '100%',
   },
   welcomeContainer: {
     justifyContent: 'center',
