@@ -1,9 +1,9 @@
 let BASE_URL;
 let MEDIA_URL;
 
-BASE_URL = "https://zero-waste-backend.vercel.app";
+BASE_URL = "https://www.zerowastegpt.org";
 
-MEDIA_URL = "https://zerowaste-media.duckdns.org/api/media/"
+MEDIA_URL = "https://media.zerowastegpt.org/"
 
 
 export { BASE_URL, MEDIA_URL };
