@@ -13,7 +13,7 @@ export default {
       turboModules: false
     },
     splash: {
-      image: "./assets/splash-icon.png",
+      image: "./assets/icon.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
@@ -21,9 +21,10 @@ export default {
       supportsTablet: true
     },
     android: {
-      package: "com.yourcompany.zero_gpt", // Eklenen alan: Uygulamanız için benzersiz paket adı
+      package: "zero_gpt", // Eklenen alan: Uygulamanız için benzersiz paket adı
+      versionCode: 2,    
       adaptiveIcon: {
-        foregroundImage: "./assets/adaptive-icon.png",
+        foregroundImage: "./assets/icon.png",
         backgroundColor: "#ffffff"
       }
     },
