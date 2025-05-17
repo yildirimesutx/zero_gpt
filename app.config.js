@@ -21,8 +21,8 @@ export default {
       supportsTablet: true
     },
     android: {
-      package: "zero_gpt", // Eklenen alan: Uygulamanız için benzersiz paket adı
-      versionCode: 2,    
+      package: "com.yourcompany.zero_gpt", // Eklenen alan: Uygulamanız için benzersiz paket adı
+      versionCode: 3,    
       adaptiveIcon: {
         foregroundImage: "./assets/icon.png",
         backgroundColor: "#ffffff"
