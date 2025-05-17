@@ -56,6 +56,7 @@ const useChatBot = () => {
             "message-id": userMessageId,
           }),
         });
+        console.log("API_URL",API_URL)
 
         console.log("standart",response )
         const responseText = await response.text();

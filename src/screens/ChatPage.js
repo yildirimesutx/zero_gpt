@@ -207,7 +207,7 @@ const renderMessageItem = ({ item }) => {
     >
       {!isUser && (
         <Image
-          source={require('../../assets/robot.png')}
+          source={require('../../assets/robot-assistant-2.png')}
           style={styles.botIcon}
         />
       )}
@@ -237,6 +237,16 @@ const renderMessageItem = ({ item }) => {
           >
             {item.text}
           </Text>
+          {!isUser && (
+              <View style={styles.feedbackContainer}>
+                <TouchableOpacity onPress={() => handleFeedback(item.id, 'like')} style={styles.feedbackIcon}>
+                  <Ionicons name="thumbs-up-outline" size={17} color={theme.colors.primary} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleFeedback(item.id, 'dislike')} style={styles.feedbackIcon}>
+                  <Ionicons name="thumbs-down-outline" size={17} color={theme.colors.primary} />
+                </TouchableOpacity>
+              </View>
+            )}
         </View>
       </View>
     </View>
@@ -254,6 +264,25 @@ const renderMessageItem = ({ item }) => {
     }
   }, [messages]);
 
+  // Yeni: mesajlara feedback göndermek için fonksiyon
+  const handleFeedback = async (messageId, feedback) => {
+    try {
+      const response = await fetch('https://www.zerowastegpt.org/api/send/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message_id: messageId.toString(), feedback }),
+      });
+      if (response.ok) {
+        Alert.alert(
+          i18n.t('feedback')
+        );
+      } else {
+        console.error('Feedback gönderilemedi:', response.status);
+      }
+    } catch (error) {
+      console.error('Feedback hatası:', error);
+    }
+  }
  
 
   return (
@@ -302,13 +331,13 @@ const renderMessageItem = ({ item }) => {
               <>
                 {i18n.locale && i18n.locale.toLowerCase().startsWith("tr") ? (
                   <Image 
-                    source={robotAssistant} 
+                    source={require('../../assets/robot-assistant-2.png')} 
                     style={styles.assistantImage} 
                     pointerEvents="none" 
                   />
                 ) : (
                   <Image 
-                    source={require('../../assets/logo_new.png')} 
+                    source={require('../../assets/robot-assistant-2.png')} 
                     style={styles.assistantImage} 
                     pointerEvents="none" 
                   />
@@ -593,4 +622,6 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: 'bold',
   },
+  feedbackContainer: { flexDirection: 'row', marginTop: 8, marginLeft: 0 },
+  feedbackIcon: { marginRight: 12 },
 });
