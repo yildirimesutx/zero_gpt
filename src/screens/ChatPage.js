@@ -269,7 +269,7 @@ const renderMessageItem = ({ item }) => {
     try {
       const response = await fetch('https://www.zerowastegpt.org/api/send/feedback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({ message_id: messageId.toString(), feedback }),
       });
       if (response.ok) {
