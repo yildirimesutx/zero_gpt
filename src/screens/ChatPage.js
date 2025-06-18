@@ -13,17 +13,16 @@ import {
   Image,
   Alert,
   Modal,
-  PanResponder,
-  Clipboard, ToastAndroid
+  Clipboard,
+  ToastAndroid
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeProvider';
 import useChatBot from '../hooks/useChatBot';
+import useChatHistoricPost from '../hooks/useChatHistoricPost';
 import i18n from '../i18n/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import robotAssistant from '../../assets/logo_tr_light.png';
-import useChatHistoricPost from '../hooks/useChatHistoricPost';
 import { StatusBar } from 'expo-status-bar';
 
 const ChatPage = () => {
@@ -34,54 +33,60 @@ const ChatPage = () => {
   const conversationId = route.params?.conversationId || null;
   const newConversation = route.params?.newConversation || false;
 
-  const [deepSearchActive, setDeepSearchActive] = useState(false);
   const { messages, sendMessage, loading, setMessages } = useChatBot();
   const { sendHistoricMail, loading: mailLoading, error: mailError } = useChatHistoricPost();
 
   const [inputText, setInputText] = useState('');
   const [dots, setDots] = useState('');
   const [showPrompts, setShowPrompts] = useState(true);
-  const [currentConversation, setCurrentConversation] = useState({
-    id: null,
-    title: '',
-    time: '',
-    messages: [],
-  });
-  // E-posta gönderimi için modal ve input state'i
+  const [deepSearchActive, setDeepSearchActive] = useState(false);
+
+  const [currentConversation, setCurrentConversation] = useState({ id: null, title: '', time: '', messages: [] });
+
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [email, setEmail] = useState('');
 
+  // --- Feedback state ---
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackMessageId, setFeedbackMessageId] = useState(null);
+  const [selectedFeedbackOption, setSelectedFeedbackOption] = useState('');
+  const [otherFeedbackText, setOtherFeedbackText] = useState('');
+
+  // --- Feedback options from i18n ---
+  const feedbackOptions = [
+    i18n.t('feedback.option.incorrect'),
+    i18n.t('feedback.option.insufficient'),
+    i18n.t('feedback.option.harmful'),
+    i18n.t('feedback.option.other'),
+  ];
+
   const prompts = i18n.t('prompts');
 
-  // Header ayarlarında sağ tarafa e-posta gönderim ikonu ekliyoruz (mesaj varsa)
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TouchableOpacity style={{ marginLeft: 16 }} onPress={() => navigation.toggleDrawer()}>
+        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.toggleDrawer()}>
           <Ionicons name="menu" size={24} color={theme.colors.headerText} />
         </TouchableOpacity>
       ),
       headerTitle: i18n.t('zero_gpt'),
       headerTitleAlign: 'center',
-      headerStyle: {
-        backgroundColor: theme.colors.headerBg,
-        elevation: 0,
-        shadowOpacity: 0,
-      },
+      headerStyle: { backgroundColor: theme.colors.headerBg, elevation: 0, shadowOpacity: 0 },
       headerTintColor: theme.colors.headerText,
-      headerRight: () =>
-        messages && messages.length > 0 && (
-          <TouchableOpacity onPress={() => setShowEmailModal(true)} style={{ marginRight: 16 }}>
+      headerRight: () => (
+        messages.length > 0 && (
+          <TouchableOpacity style={styles.headerButton} onPress={() => setShowEmailModal(true)}>
             <Ionicons name="mail-outline" size={24} color={theme.colors.headerText} />
           </TouchableOpacity>
-        ),
+        )
+      )
     });
   }, [navigation, theme, messages]);
 
   useEffect(() => {
     if (loading) {
       const interval = setInterval(() => {
-        setDots((prev) => (prev.length < 3 ? prev + '.' : ''));
+        setDots(prev => (prev.length < 3 ? prev + '.' : ''));
       }, 500);
       return () => clearInterval(interval);
     }
@@ -90,27 +95,25 @@ const ChatPage = () => {
   useEffect(() => {
     if (conversationId) {
       loadOldConversation(conversationId);
-    } else if (newConversation) {
+    } else {
       setMessages([]);
-      createNewConversation();
-    } else if (!conversationId) {
       createNewConversation();
     }
   }, [conversationId, newConversation]);
 
-  const loadOldConversation = async (id) => {
+  const loadOldConversation = async id => {
     try {
       const stored = await AsyncStorage.getItem('conversations');
       if (stored) {
-        const arr = JSON.parse(stored);
-        const found = arr.find((c) => c.id === id);
-        if (found) {
-          setCurrentConversation(found);
-          setMessages(found.messages);
+        const list = JSON.parse(stored);
+        const conv = list.find(c => c.id === id);
+        if (conv) {
+          setCurrentConversation(conv);
+          setMessages(conv.messages);
         }
       }
-    } catch (error) {
-      console.log('loadOldConversation error:', error);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -118,33 +121,29 @@ const ChatPage = () => {
     const now = new Date();
     const conv = {
       id: Date.now(),
-      title: "Yeni Sohbet",
+      title: i18n.t('chat.new_title'),
       time: now.toLocaleString(),
-      messages: [],
+      messages: []
     };
     setCurrentConversation(conv);
   };
 
-  // Her durumda konuşma güncellensin
   useEffect(() => {
-    if (currentConversation.id) {
+    if (currentConversation.id !== null) {
       saveConversation({ ...currentConversation, messages });
     }
   }, [messages]);
 
-  const saveConversation = async (conv) => {
+  const saveConversation = async conv => {
     try {
-      let data = await AsyncStorage.getItem('conversations');
-      let arr = data ? JSON.parse(data) : [];
-      const idx = arr.findIndex((c) => c.id === conv.id);
-      if (idx >= 0) {
-        arr[idx] = conv;
-      } else {
-        arr.push(conv);
-      }
-      await AsyncStorage.setItem('conversations', JSON.stringify(arr));
+      const data = await AsyncStorage.getItem('conversations');
+      const list = data ? JSON.parse(data) : [];
+      const idx = list.findIndex(c => c.id === conv.id);
+      if (idx >= 0) list[idx] = conv;
+      else list.push(conv);
+      await AsyncStorage.setItem('conversations', JSON.stringify(list));
     } catch (err) {
-      console.log('saveConversation error:', err);
+      console.log(err);
     }
   };
 
@@ -155,13 +154,12 @@ const ChatPage = () => {
     setShowPrompts(false);
   };
 
-  const handlePromptPress = (promptTitle) => {
-    sendMessage(promptTitle);
+  const handlePromptPress = title => {
+    sendMessage(title);
     setInputText('');
     setShowPrompts(false);
   };
 
-  // Fonksiyon: Modal içindeki e-postanın gönderilmesi
   const handleSendEmail = async () => {
     if (!email.trim()) {
       Alert.alert(
@@ -181,293 +179,312 @@ const ChatPage = () => {
     }
   };
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => false,
-    onMoveShouldSetPanResponder: (evt, gestureState) => {
-      // Dikey hareket 5 pikselin üzerindeyse pan responder'ı aktif et
-      return Math.abs(gestureState.dy) > 5;
-    },
-    onPanResponderMove: () => {
-      // Bu aşamada parent (FlatList) scroll davranışını devralabilir
-    },
-    onPanResponderTerminationRequest: () => true,
-  });
+  // --- Like feedback ---
+  const handleLike = messageId => {
+    Alert.alert(
+      i18n.t('feedback.alert.title'),
+      i18n.t('feedback.alert.thanks')
+    );
+    fetch('https://www.zerowastegpt.org/api/send/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message_id: messageId.toString(), status: 'like' })
+    }).catch(err => console.error('Like feedback hatası:', err));
+  };
 
+  // --- Dislike feedback modal ---
+  const openFeedbackModal = id => {
+    setFeedbackMessageId(id);
+    setSelectedFeedbackOption('');
+    setOtherFeedbackText('');
+    setShowFeedbackModal(true);
+  };
 
+  const handleSubmitFeedback = async () => {
+    if (!selectedFeedbackOption) {
+      return Alert.alert(
+        i18n.t('feedback.alert.title'),
+        i18n.t('feedback.alert.select_option')
+      );
+    }
+    const status = selectedFeedbackOption === i18n.t('feedback.option.other')
+      ? otherFeedbackText.trim()
+      : selectedFeedbackOption;
+    if (!status) {
+      return Alert.alert(
+        i18n.t('feedback.alert.title'),
+        i18n.t('feedback.alert.enter_feedback')
+      );
+    }
 
-  // renderMessageItem fonksiyonu:
-const renderMessageItem = ({ item }) => {
-  const isUser = item.sender === 'user';
-  return (
-    <View
-      style={[
-        styles.messageContainer,
-        isUser ? styles.userContainer : styles.botContainer,
-      ]}
-    >
-      {!isUser && (
-        <Image
-          source={require('../../assets/robot-assistant-2.png')}
-          style={styles.botIcon}
-        />
-      )}
-      <View
-        style={[
-          styles.messageBubble,
-          isUser ? { backgroundColor: theme.colors.userBubble } : styles.botMessage,
-        ]}
-        // Dokunma olaylarının alt bileşene iletilmesini sağlıyoruz:
-        pointerEvents="box-none"
-      >
-        <View pointerEvents="auto">
-        <Text
+    setShowFeedbackModal(false);
+    Alert.alert(
+      i18n.t('feedback.alert.title'),
+      i18n.t('feedback.alert.thanks')
+    );
+
+    try {
+      await fetch('https://www.zerowastegpt.org/api/send/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message_id: feedbackMessageId.toString(), status })
+      });
+    } catch (err) {
+      console.error('Dislike feedback hatası:', err);
+    }
+  };
+
+  const renderMessageItem = ({ item }) => {
+    const isUser = item.sender === 'user';
+    return (
+      <View style={[styles.messageContainer, isUser ? styles.userContainer : styles.botContainer]}>
+        {!isUser && (
+          <Image source={require('../../assets/robot-assistant-2.png')} style={styles.botIcon} />
+        )}
+        <View
+          style={[
+            styles.messageBubble,
+            isUser ? { backgroundColor: theme.colors.userBubble } : styles.botMessage
+          ]}
+          pointerEvents="box-none"
+        >
+          <Text
             selectable
             onLongPress={() => {
               Clipboard.setString(item.text);
-              ToastAndroid.show('Metin kopyalandı!', ToastAndroid.SHORT);
+              ToastAndroid.show(i18n.t('common.copied_to_clipboard'), ToastAndroid.SHORT);
             }}
             style={[
               styles.messageText,
               {
                 color: isUser
                   ? (theme.colors.background === '#FFFFFF' ? '#000' : '#FFF')
-                  : theme.colors.text,
-              },
+                  : theme.colors.text
+              }
             ]}
           >
             {item.text}
           </Text>
           {!isUser && (
-              <View style={styles.feedbackContainer}>
-                <TouchableOpacity onPress={() => handleFeedback(item.id, 'like')} style={styles.feedbackIcon}>
-                  <Ionicons name="thumbs-up-outline" size={17} color={theme.colors.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleFeedback(item.id, 'dislike')} style={styles.feedbackIcon}>
-                  <Ionicons name="thumbs-down-outline" size={17} color={theme.colors.primary} />
-                </TouchableOpacity>
-              </View>
-            )}
+            <View style={styles.feedbackContainer}>
+              <TouchableOpacity onPress={() => handleLike(item.id)} style={styles.feedbackIcon}>
+                <Ionicons name="thumbs-up-outline" size={17} color={theme.colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => openFeedbackModal(item.id)} style={styles.feedbackIcon}>
+                <Ionicons name="thumbs-down-outline" size={17} color={theme.colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
-    </View>
-  );
-};
-
-  
-  const displayedMessages = messages;
+    );
+  };
 
   const flatListRef = useRef(null);
-
   useEffect(() => {
-    if (flatListRef.current && messages.length > 0) {
+    if (messages.length && flatListRef.current) {
       flatListRef.current.scrollToEnd({ animated: true });
     }
   }, [messages]);
 
-  // Yeni: mesajlara feedback göndermek için fonksiyon
-  const handleFeedback = async (messageId, feedback) => {
-    try {
-      const response = await fetch('https://www.zerowastegpt.org/api/send/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({ message_id: messageId.toString(), feedback }),
-      });
-      if (response.ok) {
-        Alert.alert(
-          i18n.t('feedback')
-        );
-      } else {
-        console.error('Feedback gönderilemedi:', response.status);
-      }
-    } catch (error) {
-      console.error('Feedback hatası:', error);
-    }
-  }
- 
-
   return (
     <>
-    <StatusBar
-        // Arkaplan siyahsa beyaz ikonlar ve metin görünmesi için:
-        barStyle={theme.colors.statusBarStyle}
-        backgroundColor={theme.colors.statusBarBackground}
-      />
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
-        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <FlatList
-            ref={flatListRef}
-            keyboardShouldPersistTaps="always"
-            keyboardDismissMode="on-drag"
-            data={
-              loading
-                ? [...displayedMessages, { id: 'loading', text: dots, sender: 'bot' }]
-                : displayedMessages
-            }
-            keyExtractor={(item, index) =>
-              item.id ? item.id.toString() : `msg-${index}`
-            }
-            renderItem={({ item }) => {
-              if (item.id === 'loading') {
-                return (
+      <StatusBar barStyle={theme.colors.statusBarStyle} backgroundColor={theme.colors.statusBarBackground} />
+
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+
+            {/* Mesaj Listesi */}
+            <FlatList
+              ref={flatListRef}
+              keyboardShouldPersistTaps="always"
+              keyboardDismissMode="on-drag"
+              data={loading ? [...messages, { id: 'loading', text: dots, sender: 'bot' }] : messages}
+              keyExtractor={(item, idx) => item.id ? item.id.toString() : `msg-${idx}`}
+              renderItem={({ item }) =>
+                item.id === 'loading' ? (
                   <View style={styles.botContainer}>
                     <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
                   </View>
-                );
-              }
-              // Ekstra onStartShouldSetResponderCapture kaldırıldı
-              return renderMessageItem({ item });
-            }}
-            style={styles.messageList}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
-
-          {/* Promtlar */}
-          {showPrompts && inputText.trim().length === 0 && messages.length === 0 && (
-              <>
-                {i18n.locale && i18n.locale.toLowerCase().startsWith("tr") ? (
-                  <Image 
-                    source={require('../../assets/robot-assistant-2.png')} 
-                    style={styles.assistantImage} 
-                    pointerEvents="none" 
-                  />
                 ) : (
-                  <Image 
-                    source={require('../../assets/robot-assistant-2.png')} 
-                    style={styles.assistantImage} 
-                    pointerEvents="none" 
-                  />
-                )}
-              </>
+                  renderMessageItem({ item })
+                )
+              }
+              contentContainerStyle={styles.listContent}
+            />
+
+            {/* Prompt Görünümü */}
+            {showPrompts && inputText.trim().length === 0 && messages.length === 0 && (
+              <Image
+                source={require('../../assets/robot-assistant-2.png')}
+                style={styles.assistantImage}
+                pointerEvents="none"
+              />
+            )}
+            {showPrompts && inputText.trim().length === 0 && (
+              <View style={styles.promptsContainer}>
+                <FlatList
+                  horizontal
+                  data={prompts}
+                  keyExtractor={(_, i) => i.toString()}
+                  showsHorizontalScrollIndicator={false}
+                  keyboardShouldPersistTaps="always"
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={[styles.promptItem, { backgroundColor: theme.colors.inputBg }]}
+                      onPress={() => handlePromptPress(item.title)}
+                    >
+                      <Text style={[styles.promptTitle, { color: theme.colors.text }]}>{item.title}</Text>
+                      <Text style={[styles.promptDescription, { color: theme.colors.text }]}>
+                        {item.description}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
             )}
 
-
-          {showPrompts && inputText.trim().length === 0 && (
-            <View style={styles.promptsContainer}>
-              <FlatList
-                keyboardShouldPersistTaps="always"
-                data={prompts}
-                horizontal
-                keyExtractor={(item, idx) => `${idx}`}
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[styles.promptItem, { backgroundColor: theme.colors.inputBg }]}
-                    onPress={() => handlePromptPress(item.title)}
-                  >
-                    <Text style={[styles.promptTitle, { color: theme.colors.text }]}>{item.title}</Text>
-                    <Text style={[styles.promptDescription, { color: theme.colors.text }]}>{item.description}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          )}
-
-          {/* Normal mesaj gönderme alanı */}
-          <View style={styles.bottomContainer}>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  flexDirection: 'column',
-                  backgroundColor: theme.colors.inputBg,
-                  borderColor: theme.colors.inputBorder,
-                  borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1,
-                },
-              ]}
-            >
-              <View style={styles.inputRow}>
-                <TextInput
-                  style={[styles.textInput, { color: theme.colors.text }]}
-                  placeholder={i18n.t('placeholder_message')}
-                  placeholderTextColor={theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'}
-                  value={inputText}
-                  onChangeText={(text) => {
-                    setInputText(text);
-                    if (text.trim().length > 0) {
-                      setShowPrompts(false);
-                    }
-                  }}
-                  multiline
-                  editable={true}
-                />
-                <TouchableOpacity
-                  onPress={handleSend}
-                  style={[styles.iconWrapper, { backgroundColor: theme.colors.primary, marginLeft: 8 }]}
-                >
-                  <Ionicons name="send" size={20} color="#FFF" />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.deepSearchRow}>
-                <TouchableOpacity
-                  onPress={() => setDeepSearchActive(!deepSearchActive)}
-                  style={[
-                    styles.deepSearchButton,
-                    {
-                      borderColor: deepSearchActive
-                        ? theme.colors.primary
-                        : (theme.colors.background === '#000000' ? '#FFF' : '#000'),
-                    },
-                  ]}
-                >
-                  <Ionicons
-                    name="globe-outline"
-                    size={20}
-                    color={deepSearchActive ? theme.colors.primary : theme.colors.text}
+            {/* Mesaj Giriş & Gönder */}
+            <View style={styles.bottomContainer}>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  {
+                    backgroundColor: theme.colors.inputBg,
+                    borderColor: theme.colors.inputBorder,
+                    borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1
+                  }
+                ]}
+                pointerEvents="box-none"
+              >
+                <View style={styles.inputRow}>
+                  <TextInput
+                    style={[styles.textInput, { color: theme.colors.text }]}
+                    placeholder={i18n.t('placeholder_message')}
+                    placeholderTextColor={theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'}
+                    value={inputText}
+                    onChangeText={text => { setInputText(text); setShowPrompts(!text.trim()); }}
+                    multiline
                   />
-                  <Text style={{ marginLeft: 4, color: deepSearchActive ? theme.colors.primary : theme.colors.text }}>
-                    {i18n.t('deep_search')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          {/* Email gönderimi için modal */}
-          <Modal visible={showEmailModal} transparent animationType="fade">
-            <View style={styles.modalOverlay}>
-              <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-                <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-                  {i18n.t('send_history.email_prompt')}
-                </Text>
-                <TextInput
-                  style={[styles.modalInput, { color: theme.colors.text, borderColor: theme.colors.inputBorder }]}
-                  placeholder={i18n.t('send_history.email_placeholder')}
-                  placeholderTextColor="#999"
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                />
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setEmail('');
-                      setShowEmailModal(false);
-                    }}
-                    style={[styles.modalButton, { backgroundColor: '#aaa' }]}
-                  >
-                    <Text style={styles.modalButtonText}>{i18n.t('send_history.cancel')}</Text>
+                  <TouchableOpacity onPress={handleSend} style={[styles.sendButton, { backgroundColor: theme.colors.primary }]}>
+                    <Ionicons name="send" size={20} color="#FFF" />
                   </TouchableOpacity>
+                </View>
+                <View style={styles.deepSearchRow}>
                   <TouchableOpacity
-                    onPress={handleSendEmail}
-                    style={[styles.modalButton, { backgroundColor: theme.colors.primary }]}
-                    disabled={mailLoading}
+                    onPress={() => setDeepSearchActive(!deepSearchActive)}
+                    style={[
+                      styles.deepSearchButton,
+                      { borderColor: deepSearchActive ? theme.colors.primary : theme.colors.text }
+                    ]}
                   >
-                    <Text style={styles.modalButtonText}>
-                      {mailLoading ? i18n.t('send_history.sending') : i18n.t('send_history.send')}
-                    </Text>
+                    <Ionicons
+                      name="globe-outline"
+                      size={20}
+                      color={deepSearchActive ? theme.colors.primary : theme.colors.text}
+                    />
+                    <Text style={styles.deepSearchText}>{i18n.t('deep_search')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
-          </Modal>
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+
+            {/* Email Modal */}
+            <Modal visible={showEmailModal} transparent animationType="fade">
+              <View style={styles.modalOverlay}>
+                <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+                  <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+                    {i18n.t('send_history.email_prompt')}
+                  </Text>
+                  <TextInput
+                    style={[styles.modalInput, { color: theme.colors.text, borderColor: theme.colors.inputBorder }]}
+                    placeholder={i18n.t('send_history.email_placeholder')}
+                    placeholderTextColor="#999"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                  />
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#aaa' }]} onPress={() => setShowEmailModal(false)}>
+                      <Text style={styles.modalButtonText}>{i18n.t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: theme.colors.primary }]}
+                      onPress={handleSendEmail}
+                      disabled={mailLoading}
+                    >
+                      <Text style={styles.modalButtonText}>
+                        {mailLoading ? i18n.t('send_history.sending') : i18n.t('common.send')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+
+            {/* Feedback Modal */}
+            <Modal visible={showFeedbackModal} transparent animationType="fade">
+              <View style={styles.modalOverlay}>
+                <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+                  <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+                    {i18n.t('feedback.modal.title')}
+                  </Text>
+                  {feedbackOptions.map(opt => (
+                    <TouchableOpacity
+                      key={opt}
+                      style={styles.feedbackOption}
+                      onPress={() => setSelectedFeedbackOption(opt)}
+                    >
+                      <Text style={[styles.feedbackText, { color: theme.colors.text }]}>
+                        {selectedFeedbackOption === opt ? '● ' : '○ '} {opt}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                  {selectedFeedbackOption === i18n.t('feedback.option.other') && (
+                    <TextInput
+                      style={[styles.modalInput, { color: theme.colors.text, borderColor: theme.colors.inputBorder }]}
+                      placeholder={i18n.t('feedback.placeholder')}
+                      placeholderTextColor="#999"
+                      value={otherFeedbackText}
+                      onChangeText={setOtherFeedbackText}
+                      multiline
+                    />
+                  )}
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton, { backgroundColor: '#aaa' }]}
+                      onPress={() => setShowFeedbackModal(false)}
+                    >
+                      <Text style={styles.modalButtonText}>{i18n.t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.modalButton,
+                        {
+                          backgroundColor:
+                            selectedFeedbackOption === i18n.t('feedback.option.other') && otherFeedbackText.trim() === ''
+                              ? '#ccc'
+                              : theme.colors.primary
+                        }
+                      ]}
+                      onPress={handleSubmitFeedback}
+                      disabled={selectedFeedbackOption === i18n.t('feedback.option.other') && otherFeedbackText.trim() === ''}
+                    >
+                      <Text style={styles.modalButtonText}>{i18n.t('common.send')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+
+          </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </>
   );
 };
@@ -475,153 +492,40 @@ const renderMessageItem = ({ item }) => {
 export default ChatPage;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: 'relative',
-  },
-  messageList: {
-    flex: 1,
-    paddingHorizontal: 16,
-    marginTop: 10,
-  },
-  messageContainer: {
-    marginVertical: 5,
-    flexDirection: 'row',
-  },
-  userContainer: {
-    alignSelf: 'flex-end',
-    alignItems: 'flex-end',
-  },
-  botContainer: {
-    alignSelf: 'flex-start',
-    alignItems: 'flex-start',
-  },
-  botIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-    marginRight: 8,
-  },
-  messageBubble: {
-    padding: 12,
-    borderRadius: 18,
-    maxWidth: '90%',
-  },
-  botMessage: {
-    backgroundColor: 'transparent',
-    width: '100%',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
-  },
-  messageText: {
-    fontSize: 16,
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
-  },
-  bottomContainer: {
-    padding: 10,
-    marginBottom: 30,
-  },
-  inputWrapper: {
-    borderRadius: 24,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 16,
-    height: 60,
-  },
-  iconWrapper: {
-    padding: 10,
-    borderRadius: 20,
-  },
-  deepSearchRow: {
-    marginTop: 8,
-    alignItems: 'flex-start',
-  },
-  deepSearchButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  loadingText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingHorizontal: 16,
-    textAlign: 'left',
-  },
-  promptsContainer: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  promptItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    marginRight: 8,
-    minWidth: 150,
-  },
-  promptTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  promptDescription: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  assistantImage: {
-    position: 'absolute',
-    top: '15%',
-    alignSelf: 'center',
-    opacity: 0.5,
-    width: 120,
-    height: 120,
-    resizeMode: 'contain',
-    zIndex: 2,
-    pointerEvents: 'none',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '80%',
-    borderRadius: 12,
-    padding: 16,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 8,
-    marginBottom: 16,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginLeft: 8,
-  },
-  modalButtonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-  },
-  feedbackContainer: { flexDirection: 'row', marginTop: 8, marginLeft: 0 },
+  flex: { flex: 1 },
+  container: { flex: 1, position: 'relative' },
+  headerButton: { marginHorizontal: 16 },
+  listContent: { paddingBottom: 20 },
+  messageContainer: { marginVertical: 5, flexDirection: 'row' },
+  userContainer: { alignSelf: 'flex-end', alignItems: 'flex-end' },
+  botContainer: { alignSelf: 'flex-start', alignItems: 'flex-start' },
+  botIcon: { width: 30, height: 30, resizeMode: 'contain', marginRight: 8 },
+  messageBubble: { padding: 12, borderRadius: 18, maxWidth: '90%' },
+  botMessage: { backgroundColor: 'transparent', width: '100%' },
+  messageText: { fontSize: 16, fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto' },
+  loadingText: { fontSize: 24, fontWeight: 'bold', paddingHorizontal: 16 },
+  assistantImage: { position: 'absolute', top: '15%', alignSelf: 'center', opacity: 0.5, width: 120, height: 120, resizeMode: 'contain', zIndex: 2 },
+  promptsContainer: { paddingVertical: 8, paddingHorizontal: 12 },
+  promptItem: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, marginRight: 8, minWidth: 150 },
+  promptTitle: { fontSize: 14, fontWeight: 'bold' },
+  promptDescription: { fontSize: 12, marginTop: 2 },
+  bottomContainer: { padding: 10, marginBottom: 30 },
+  inputWrapper: { borderRadius: 24, paddingHorizontal: 12, paddingVertical: 8 },
+  inputRow: { flexDirection: 'row', alignItems: 'center' },
+  textInput: { flex: 1, fontSize: 16, height: 60 },
+  sendButton: { padding: 10, borderRadius: 20 },
+  deepSearchRow: { marginTop: 8, alignItems: 'flex-start' },
+  deepSearchButton: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, borderWidth: 1 },
+  deepSearchText: { marginLeft: 4, fontSize: 14 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: '80%', borderRadius: 12, padding: 16 },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  modalInput: { borderWidth: 1, borderRadius: 8, padding: 8, marginBottom: 16 },
+  modalButtons: { flexDirection: 'row', justifyContent: 'flex-end' },
+  modalButton: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8, marginLeft: 8 },
+  modalButtonText: { color: '#FFF', fontWeight: 'bold' },
+  feedbackContainer: { flexDirection: 'row', marginTop: 8 },
   feedbackIcon: { marginRight: 12 },
+  feedbackOption: { paddingVertical: 8 },
+  feedbackText: { fontSize: 16 }
 });

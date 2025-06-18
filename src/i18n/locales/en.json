@@ -134,13 +134,31 @@
     "phone": "Call us"
   },
   "contact" : "Contact",
-  "feedback": "Thank you for your feedback"
-   
 
+  "feedback": {
+  "modal": {
+    "title": "Feedback"
+  },
+  "option": {
+    "incorrect": "Incorrect / Wrong Answer",
+    "insufficient": "Incomplete / Insufficient Answer",
+    "harmful": "Harmful / Inappropriate Content",
+    "other": "Other"
+  },
+  "placeholder": "Please specify...",
+  "alert": {
+    "title": "Feedback",
+    "thanks": "Thank you for your feedback",
+    "select_option": "Please select an option",
+    "enter_feedback": "Please enter your feedback"
+  }
+},
 
-    
+"common": {
+    "cancel": "Cancel",
+    "send": "Send",
+    "copied_to_clipboard": "Copied to clipboard!"
+  }
 
-
-   
-
+  
   }

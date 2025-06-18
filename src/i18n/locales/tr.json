@@ -135,10 +135,31 @@
   },
   "contact" : "İletişim",
 
-  "feedback" : "Geri bildiriminiz için teşekkür ederiz"
+  "feedback": {
+  "modal": {
+    "title": "Geri Bildirim"
+  },
+  "option": {
+    "incorrect": "Yanlış / Hatalı Cevap",
+    "insufficient": "Eksik / Yetersiz Cevap",
+    "harmful": "Zararlı / Uygunsuz İçerik",
+    "other": "Diğer"
+  },
+  "placeholder": "Lütfen belirtiniz...",
+  "alert": {
+    "title": "Geri Bildirim",
+    "thanks": "Geri bildiriminiz için teşekkür ederiz",
+    "select_option": "Lütfen bir seçenek seçin",
+    "enter_feedback": "Lütfen geri bildiriminizi girin"
+  }
+ 
+},
 
-
-
+  "common": {
+    "cancel": "İptal",
+    "send": "Gönder",
+    "copied_to_clipboard": "Metin kopyalandı!"
+  }
 
 
 
