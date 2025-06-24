@@ -159,7 +159,10 @@
     "cancel": "İptal",
     "send": "Gönder",
     "copied_to_clipboard": "Metin kopyalandı!"
-  }
+  },
+
+  "policy_text" : "ZeroGPT hata yapabilir. Önemli bilgileri kontrol edin."
+
 
 
 

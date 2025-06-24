@@ -392,6 +392,7 @@ const ChatPage = () => {
                   </TouchableOpacity>
                 </View>
               </View>
+              <Text style={[ styles.policy_text, { color: theme.colors.text }]}>{i18n.t('policy_text')}</Text>
             </View>
 
             {/* Email Modal */}
@@ -527,5 +528,6 @@ const styles = StyleSheet.create({
   feedbackContainer: { flexDirection: 'row', marginTop: 8 },
   feedbackIcon: { marginRight: 12 },
   feedbackOption: { paddingVertical: 8 },
-  feedbackText: { fontSize: 16 }
+  feedbackText: { fontSize: 16 },
+  policy_text : {fontSize: 11, textAlign: 'center', marginTop:10 }
 });

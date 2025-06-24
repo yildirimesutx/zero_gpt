@@ -158,7 +158,8 @@
     "cancel": "Cancel",
     "send": "Send",
     "copied_to_clipboard": "Copied to clipboard!"
-  }
+  },
+  "policy_text" : "ZeroGPT may make mistakes. Please verify any important information."
 
   
   }
