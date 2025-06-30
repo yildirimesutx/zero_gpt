@@ -291,109 +291,107 @@ const ChatPage = () => {
     <>
       <StatusBar barStyle={theme.colors.statusBarStyle} backgroundColor={theme.colors.statusBarBackground} />
 
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-        >
-          <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-
-            {/* Mesaj Listesi */}
-            <FlatList
-              ref={flatListRef}
-              keyboardShouldPersistTaps="always"
-              keyboardDismissMode="on-drag"
-              data={loading ? [...messages, { id: 'loading', text: dots, sender: 'bot' }] : messages}
-              keyExtractor={(item, idx) => item.id ? item.id.toString() : `msg-${idx}`}
-              renderItem={({ item }) =>
-                item.id === 'loading' ? (
-                  <View style={styles.botContainer}>
-                    <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
-                  </View>
-                ) : (
-                  renderMessageItem({ item })
-                )
-              }
-              contentContainerStyle={styles.listContent}
-            />
-
-            {/* Prompt Görünümü */}
-            {showPrompts && inputText.trim().length === 0 && messages.length === 0 && (
-              <Image
-                source={require('../../assets/robot-assistant-2.png')}
-                style={styles.assistantImage}
-                pointerEvents="none"
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 50}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={[styles.container, { backgroundColor: theme.colors.background, flex: 1 }]}>
+            <View style={{ flex: 1 }}>
+              {/* Mesaj Listesi */}
+              <FlatList
+                ref={flatListRef}
+                keyboardShouldPersistTaps="always"
+                // keyboardDismissMode="on-drag"
+                keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'none'}
+                data={loading ? [...messages, { id: 'loading', text: dots, sender: 'bot' }] : messages}
+                keyExtractor={(item, idx) => item.id ? item.id.toString() : `msg-${idx}`}
+                renderItem={({ item }) =>
+                  item.id === 'loading' ? (
+                    <View style={styles.botContainer}>
+                      <Text style={[styles.loadingText, { color: theme.colors.text }]}>{dots}</Text>
+                    </View>
+                  ) : (
+                    renderMessageItem({ item })
+                  )
+                }
+                contentContainerStyle={[styles.listContent, { paddingBottom: 8 }]}
+                style={{ flex: 1 }}
               />
-            )}
-            {showPrompts && inputText.trim().length === 0 && (
-              <View style={styles.promptsContainer}>
-                <FlatList
-                  horizontal
-                  data={prompts}
-                  keyExtractor={(_, i) => i.toString()}
-                  showsHorizontalScrollIndicator={false}
-                  keyboardShouldPersistTaps="always"
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={[styles.promptItem, { backgroundColor: theme.colors.inputBg }]}
-                      onPress={() => handlePromptPress(item.title)}
-                    >
-                      <Text style={[styles.promptTitle, { color: theme.colors.text }]}>{item.title}</Text>
-                      <Text style={[styles.promptDescription, { color: theme.colors.text }]}>
-                        {item.description}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                />
-              </View>
-            )}
-
-            {/* Mesaj Giriş & Gönder */}
-            <View style={styles.bottomContainer}>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  {
-                    backgroundColor: theme.colors.inputBg,
-                    borderColor: theme.colors.inputBorder,
-                    borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1
-                  }
-                ]}
-                pointerEvents="box-none"
-              >
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={[styles.textInput, { color: theme.colors.text }]}
-                    placeholder={i18n.t('placeholder_message')}
-                    placeholderTextColor={theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'}
-                    value={inputText}
-                    onChangeText={text => { setInputText(text); setShowPrompts(!text.trim()); }}
-                    multiline
+              {/* Promptlar inputun hemen üstünde, sabit boşluklu */}
+              {showPrompts && inputText.trim().length === 0 && (
+                <View style={styles.promptsContainerFixed}>
+                  <FlatList
+                    horizontal
+                    data={prompts}
+                    keyExtractor={(_, i) => i.toString()}
+                    showsHorizontalScrollIndicator={false}
+                    keyboardShouldPersistTaps="always"
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={[styles.promptItem, { backgroundColor: theme.colors.inputBg }]}
+                        onPress={() => handlePromptPress(item.title)}
+                      >
+                        <Text style={[styles.promptTitle, { color: theme.colors.text }]}>{item.title}</Text>
+                        <Text style={[styles.promptDescription, { color: theme.colors.text }]}> 
+                          {item.description}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   />
-                  <TouchableOpacity onPress={handleSend} style={[styles.sendButton, { backgroundColor: theme.colors.primary }]}>
-                    <Ionicons name="send" size={20} color="#FFF" />
-                  </TouchableOpacity>
                 </View>
-                <View style={styles.deepSearchRow}>
-                  <TouchableOpacity
-                    onPress={() => setDeepSearchActive(!deepSearchActive)}
-                    style={[
-                      styles.deepSearchButton,
-                      { borderColor: deepSearchActive ? theme.colors.primary : theme.colors.text }
-                    ]}
-                  >
-                    <Ionicons
-                      name="globe-outline"
-                      size={20}
-                      color={deepSearchActive ? theme.colors.primary : theme.colors.text}
+              )}
+            </View>
+            {/* Mesaj Giriş & Gönder */}
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+            >
+              <View style={styles.bottomContainer}> 
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    {
+                      backgroundColor: theme.colors.inputBg,
+                      borderColor: theme.colors.inputBorder,
+                      borderWidth: theme.colors.inputBorder === 'transparent' ? 0 : 1
+                    }
+                  ]}
+                  pointerEvents="box-none"
+                >
+                  <View style={styles.inputRow}>
+                    <TextInput
+                      style={[styles.textInput, { color: theme.colors.text }]}
+                      placeholder={i18n.t('placeholder_message')}
+                      placeholderTextColor={theme.colors.text === '#FFFFFF' ? '#aaa' : '#555'}
+                      value={inputText}
+                      onChangeText={text => { setInputText(text); setShowPrompts(!text.trim()); }}
+                      multiline
                     />
-                    <Text style={styles.deepSearchText}>{i18n.t('deep_search')}</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity onPress={handleSend} style={[styles.sendButton, { backgroundColor: theme.colors.primary }]}> 
+                      <Ionicons name="send" size={20} color="#FFF" />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.deepSearchRow}>
+                    <TouchableOpacity
+                      onPress={() => setDeepSearchActive(!deepSearchActive)}
+                      style={[
+                        styles.deepSearchButton,
+                        { borderColor: deepSearchActive ? theme.colors.primary : theme.colors.text }
+                      ]}
+                    >
+                      <Ionicons
+                        name="globe-outline"
+                        size={20}
+                        color={deepSearchActive ? theme.colors.primary : theme.colors.text}
+                      />
+                      <Text style={styles.deepSearchText}>{i18n.t('deep_search')}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-              <Text style={[ styles.policy_text, { color: theme.colors.text }]}>{i18n.t('policy_text')}</Text>
-            </View>
+            </KeyboardAvoidingView>
 
             {/* Email Modal */}
             <Modal visible={showEmailModal} transparent animationType="fade">
@@ -483,9 +481,14 @@ const ChatPage = () => {
               </View>
             </Modal>
 
+            {/* Policy text en altta, klavye açılınca gizlenebilir */}
+            <View style={{ position: 'absolute', left: 0, right: 0, bottom: 25, alignItems: 'center', zIndex: 1 }} pointerEvents="none">
+              <Text style={[styles.policy_text, { color: theme.colors.text }]}>{i18n.t('policy_text')}</Text>
+            </View>
+
           </View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </>
   );
 };
@@ -494,7 +497,7 @@ export default ChatPage;
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  container: { flex: 1, position: 'relative' },
+  container: { flex: 1, position: 'relative', paddingBottom: 40 },
   headerButton: { marginHorizontal: 16 },
   listContent: { paddingBottom: 20 },
   messageContainer: { marginVertical: 5, flexDirection: 'row' },
@@ -506,14 +509,14 @@ const styles = StyleSheet.create({
   messageText: { fontSize: 16, fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto' },
   loadingText: { fontSize: 24, fontWeight: 'bold', paddingHorizontal: 16 },
   assistantImage: { position: 'absolute', top: '15%', alignSelf: 'center', opacity: 0.5, width: 120, height: 120, resizeMode: 'contain', zIndex: 2 },
-  promptsContainer: { paddingVertical: 8, paddingHorizontal: 12 },
+  promptsContainerFixed: { paddingVertical: 8, paddingHorizontal: 12, marginBottom: 8 },
   promptItem: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, marginRight: 8, minWidth: 150 },
   promptTitle: { fontSize: 14, fontWeight: 'bold' },
   promptDescription: { fontSize: 12, marginTop: 2 },
-  bottomContainer: { padding: 10, marginBottom: 30 },
+  bottomContainer: { padding: 10 },
   inputWrapper: { borderRadius: 24, paddingHorizontal: 12, paddingVertical: 8 },
   inputRow: { flexDirection: 'row', alignItems: 'center' },
-  textInput: { flex: 1, fontSize: 16, height: 60 },
+  textInput: { flex: 1, fontSize: 16, minHeight: 40, maxHeight: 100 },
   sendButton: { padding: 10, borderRadius: 20 },
   deepSearchRow: { marginTop: 8, alignItems: 'flex-start' },
   deepSearchButton: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, borderWidth: 1 },
@@ -529,5 +532,5 @@ const styles = StyleSheet.create({
   feedbackIcon: { marginRight: 12 },
   feedbackOption: { paddingVertical: 8 },
   feedbackText: { fontSize: 16 },
-  policy_text : {fontSize: 11, textAlign: 'center', marginTop:10 }
+  policy_text : {fontSize: 11, textAlign: 'center' }
 });
