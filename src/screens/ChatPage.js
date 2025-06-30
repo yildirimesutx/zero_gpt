@@ -24,11 +24,17 @@ import useChatHistoricPost from '../hooks/useChatHistoricPost';
 import i18n from '../i18n/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
+
 
 const ChatPage = () => {
   const theme = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
+
+  const insets = useSafeAreaInsets();
 
   const conversationId = route.params?.conversationId || null;
   const newConversation = route.params?.newConversation || false;
@@ -91,6 +97,8 @@ const ChatPage = () => {
       return () => clearInterval(interval);
     }
   }, [loading]);
+
+  
 
   useEffect(() => {
     if (conversationId) {
@@ -315,9 +323,18 @@ const ChatPage = () => {
                   ) : (
                     renderMessageItem({ item })
                   )
+                  
                 }
-                contentContainerStyle={[styles.listContent, { paddingBottom: 8 }]}
+                // contentContainerStyle={[styles.listContent, { paddingBottom: 8 }]}
+                contentContainerStyle={[
+                   styles.listContent,
+                     // insets.bottom + inputWrapper yüksekliği (örn. 80)
+                     { paddingBottom: insets.bottom + 80 }
+                   ]}
                 style={{ flex: 1 }}
+                onContentSizeChange={() => {
+                  flatListRef.current?.scrollToEnd({ animated: true });
+                }}
               />
               {/* Promptlar inputun hemen üstünde, sabit boşluklu */}
               {showPrompts && inputText.trim().length === 0 && (
